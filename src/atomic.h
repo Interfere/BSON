@@ -21,62 +21,12 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef _BSON_BSONELEMENT_H_
-#define _BSON_BSONELEMENT_H_
+#ifndef _BSON_ATOMIC_H_
+#define _BSON_ATOMIC_H_
 
-#include "bsontypes.h"
+#include <stdint.h>
 
-#include <string.h>
+int32_t atomic_increment(volatile int32_t* value);
+int64_t atomic_increment64(volatile int64_t* value);
 
-/**
- * Generic type for bson element
- */
-typedef struct bson_element* bson_element_ref;
-struct bson_element
-{
-    char        data[1];    /* Raw Data of an element */
-};
-
-/**
- * Get type of BSON element
- */
-inline bson_type_t bson_element_type(bson_element_ref __restrict e)
-{
-    return e->data[0];
-}
-
-/**
- * Get field name of BSON element
- */
-inline const char* bson_element_fieldname(bson_element_ref __restrict e)
-{
-    if(bson_element_type(e) == bson_type_eoo)
-    {
-        return 0;
-    }
-    
-    return e->data + 1;
-}
-
-/**
- * Get size of the field of BSON element
- */
-inline size_t bson_element_fieldnamesize(bson_element_ref __restrict e)
-{
-    return strlen(bson_element_fieldname(e)) + 1;
-}
-
-/**
- * Get Raw data of BSON element value
- */
-inline const char* bson_element_value(bson_element_ref __restrict e)
-{
-    if(bson_element_type(e) == bson_type_eoo)
-    {
-        return 0;
-    }
-    
-    return e->data + bson_element_fieldnamesize(e) + 1;
-}
-
-#endif // _BSON_BSONELEMENT_H_
+#endif // _BSON_ATOMIC_H_

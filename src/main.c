@@ -22,8 +22,24 @@
  */
 
 #include <stdlib.h>
+#include <stdio.h>
+#include "oid.h"
 
 int main(int argc, char* argv[])
 {
+    bson_oid_ref oid = bson_oid_create();
+    char* representation = bson_oid_string_create(oid);
+    bson_oid_destroy(oid);
+    
+    puts(representation);
+    free(representation);
+    
+    oid = bson_oid_create();
+    representation = bson_oid_string_create(oid);
+    bson_oid_destroy(oid);
+    
+    puts(representation);
+    free(representation);
+    
     return EXIT_SUCCESS;
 }

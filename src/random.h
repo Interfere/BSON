@@ -21,47 +21,15 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include "bsonelement.h"
+#ifndef _BSON_RANDOM_H_
+#define _BSON_RANDOM_H_
 
-#include <string.h>
+#include <stdint.h>
 
-/*********************** BSON element private data ****************************/
-struct bson_element
-{
-    union {
-        bson_type_t type;       /* Type of the element */
-        char        data[1];    /* Raw Data of an element */
-    };
-};
+/**
+ * Interface for platform-specific random number generator
+ */
+int32_t random_generate_next32();
+int64_t random_generate_next64();
 
-/********************** BSON element private interface ************************/
-static size_t bson_element_fieldnamesize(bson_element_t e)
-{
-    return strlen(bson_element_fieldname(e)) + 1;
-}
-
-/********************** BSON element public interface *************************/
-bson_type_t bson_element_type(bson_element_t e)
-{
-    return e->type;
-}
-
-const char* bson_element_fieldname(bson_element_t e)
-{
-    if(bson_element_type(e) == bson_type_eoo)
-    {
-        return 0;
-    }
-    
-    return e->data + 1;
-}
-
-const char* bson_element_value(bson_element_t e)
-{
-    if(bson_element_type(e) == bson_type_eoo)
-    {
-        return 0;
-    }
-    
-    return e->data + bson_element_fieldnamesize(e) + 1;
-}
+#endif // _BSON_RANDOM_H_
