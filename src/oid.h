@@ -47,11 +47,6 @@ struct bson_oid
 {
     union {
         struct {
-            int32_t x;
-            int32_t y;
-            int32_t z;
-        };
-        struct {
             int64_t a;
             int32_t b;
         };
@@ -82,6 +77,16 @@ bson_oid_ref bson_oid_create_with_string(const char *);
  * Create ObjectID with byte array
  */
 bson_oid_ref bson_oid_create_with_bytes(const uint8_t arr[bson_oid_size]);
+
+/**
+ * Initialize ObjectID
+ */
+void bson_oid_init(bson_oid_ref __restrict oid);
+
+/**
+ * Initialize ObjectID in sequential mode
+ */
+void bson_oid_init_sequential(bson_oid_ref __restrict oid);
 
 /**
  * Destruct ObjectID

@@ -28,6 +28,7 @@
 int main(int argc, char* argv[])
 {
     bson_oid_ref oid = bson_oid_create();
+    bson_oid_init_sequential(oid);
     char* representation = bson_oid_string_create(oid);
     bson_oid_destroy(oid);
     
@@ -35,6 +36,7 @@ int main(int argc, char* argv[])
     free(representation);
     
     oid = bson_oid_create();
+    bson_oid_init_sequential(oid);
     representation = bson_oid_string_create(oid);
     bson_oid_destroy(oid);
     

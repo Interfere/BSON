@@ -25,6 +25,7 @@
 
 #include <stdlib.h>
 #include <pthread.h>
+#include <unistd.h>
 #include "random.h"
 #include "atomic.h"
 
@@ -34,10 +35,13 @@ static int64_t s_sequential_inc = 0;
 /*********************** Private ObjectID interface ***************************/
 static void bson_oid_generate_machine_and_pid(struct machine_and_pid *__restrict p)
 {
-    
+    *(int64_t *)p = random_generate_next64();
+    pid_t _pid = getpid();
+    p->pid ^= (uint16_t)_pid;
+    *(uint16_t *)&p->machine_number[1] ^= _pid >> 16;
 }
 
-static void bson_oid_init(bson_oid_ref __restrict oid)
+void bson_oid_init(bson_oid_ref __restrict oid)
 {
     static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
     static int32_t inc = 0;
@@ -73,7 +77,7 @@ static void bson_oid_init(bson_oid_ref __restrict oid)
     }
 }
 
-static void bson_oid_init_sequential(bson_oid_ref __restrict oid)
+void bson_oid_init_sequential(bson_oid_ref __restrict oid)
 {
     {
         const time_t t = time(0);
@@ -102,10 +106,6 @@ static void bson_oid_init_sequential(bson_oid_ref __restrict oid)
 bson_oid_ref bson_oid_create()
 {
     bson_oid_ref oid = (bson_oid_ref)malloc(sizeof(struct bson_oid));
-    if(oid)
-    {
-        bson_oid_init(oid);
-    }
     return oid;
 }
 
