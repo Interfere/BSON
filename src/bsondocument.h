@@ -60,18 +60,12 @@ static __inline__ bson_document_ref bson_document_create_with_data(const char *d
 /**
  * Destroy document
  */
-static __inline__ void bson_document_destroy(bson_document_ref __restrict doc)
-{
-    free(doc);
-}
+#define bson_document_destroy(doc)          free(doc)
 
 /**
  * Get size of the document
  */
-static __inline__ int32_t bson_document_size(bson_document_ref __restrict doc)
-{
-    return *(int32_t *)doc->data;
-}
+#define bson_document_size(doc)             (*(int32_t *)doc->data)
 
 
 #endif // _BSON_BSONDOCUMENT_H_

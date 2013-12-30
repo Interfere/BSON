@@ -29,29 +29,77 @@
 #define _CPL_ARRAY_H_
 
 #include <stdlib.h>
+#include <string.h>
 
 #define _CPL_DEFAULT_ARRAY_SIZE     64
 
+#define _CPL_OK                     0
+#define _CPL_INVALID_ARG            1
+#define _CPL_NOMEM                  2
+
 struct cpl_array
 {
-    char*       data;
+    size_t          szelem;     /* size of an element */
+    size_t          nreserv;    /* reserved size */
+    size_t          count;      /* count of elements */
+    void*           data;
 };
 typedef struct cpl_array* cpl_array_ref;
 
 /*
- * Creates empty array.
+ * Creates an empty array with space reserved for _count_ items of size _sz_.
  */
-static __inline__ cpl_array_ref cpl_array_create()
+cpl_array_ref cpl_array_create(size_t sz, size_t nreserv);
+
+/*
+ * Creates an empty array for items sizeof _sz_
+ */
+#define cpl_array_create_sz(sz)         cpl_array_create(sz, _CPL_DEFAULT_ARRAY_SIZE)
+
+/*
+ * Create an array with copy of other array.
+ */
+static __inline__ cpl_array_ref cpl_array_create_copy(cpl_array_ref __restrict o)
 {
-    return
+    cpl_array_ref a = cpl_array_create(o->szelem, o->nreserv);
+    if(a)
+    {
+        memcpy(a->data, o->data, o->count);
+        a->count = o->count;
+    }
+    return a;
 }
 
 /*
  * Destroys an array.
  */
-stratic __inline__ cpl_array_destroy(cpl_array_ref __restrict a)
+#define cpl_array_destroy(a)            free((a)->data); free(a)
+
+/*
+ * Count of elements in array
+ */
+#define cpl_array_count(a)              ((a)->count)
+
+/*
+ * Get raw pointer of elements.
+ */
+#define cpl_array_data(a, type)         (type *)((a)->data)
+
+/*
+ * Get access of an element.
+ */
+static __inline__ void* cpl_array_get_p(cpl_array_ref __restrict a, size_t i)
 {
-    free(a);
+    if(i < cpl_array_count(a))
+        return cpl_array_data(a, char) + i * a->szelem;
+    return 0;
 }
+#define cpl_array_get(a, i, type)       (*(type*)cpl_array_get_p(a, i))
+
+/*
+ * Add an element to the end of an array
+ */
+int cpl_array_push_back_p(cpl_array_ref a, void* p, size_t sz);
+#define cpl_array_push_back(a, v)       cpl_array_push_back_p(a, &(v), sizeof(v))
 
 #endif // _CPL_ARRAY_H_

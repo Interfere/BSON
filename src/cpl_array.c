@@ -21,30 +21,50 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include "oid.h"
 #include "cpl_array.h"
 
-int main(int argc, char* argv[])
+cpl_array_ref cpl_array_create(size_t sz, size_t nreserv)
 {
-    bson_oid_ref oid = bson_oid_create();
-    bson_oid_init_sequential(oid);
-    char* representation = bson_oid_string_create(oid);
-    bson_oid_destroy(oid);
+    cpl_array_ref a = (cpl_array_ref)malloc(sizeof(struct cpl_array));
+    if(a)
+    {
+        a->szelem = sz;
+        a->nreserv = nreserv;
+        a->count = 0;
+        a->data = malloc(sz * nreserv);
+        if(!a->data)
+        {
+            free(a);
+            a = 0;
+        }
+    }
+    return a;
+}
+
+
+int cpl_array_push_back_p(cpl_array_ref a, void* p, size_t sz)
+{
+    /* Size of buffer should be at least size of an element */
+    if(sz < a->szelem) return _CPL_INVALID_ARG;
     
-    puts(representation);
-    free(representation);
+    /* get new count of elements in array */
+    size_t new_count = a->count + sz / a->szelem;
+    size_t nreserv = a->nreserv;
+    while(new_count >= nreserv)
+    {
+        nreserv *= 2;
+    }
     
-    oid = bson_oid_create();
-    bson_oid_init_sequential(oid);
-    representation = bson_oid_string_create(oid);
-    bson_oid_destroy(oid);
+    /* Try to reallocate the buffer */
+    void* ptr = realloc(a->data, nreserv * a->szelem);
+    if(!ptr)
+    {
+        return _CPL_NOMEM;
+    }
+    a->data = ptr;
+    a->nreserv = nreserv;
+    memcpy(cpl_array_get_p(a, cpl_array_count(a) - 1), p, sz);
+    a->count += new_count;
     
-    puts(representation);
-    free(representation);
-    
-    
-    
-    return EXIT_SUCCESS;
+    return _CPL_OK;
 }
