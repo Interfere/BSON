@@ -40,7 +40,7 @@ struct bson_element
 /**
  * Get type of BSON element
  */
-inline bson_type_t bson_element_type(bson_element_ref __restrict e)
+static __inline__ bson_type_t bson_element_type(bson_element_ref __restrict e)
 {
     return e->data[0];
 }
@@ -48,7 +48,7 @@ inline bson_type_t bson_element_type(bson_element_ref __restrict e)
 /**
  * Get field name of BSON element
  */
-inline const char* bson_element_fieldname(bson_element_ref __restrict e)
+static __inline__ const char* bson_element_fieldname(bson_element_ref __restrict e)
 {
     if(bson_element_type(e) == bson_type_eoo)
     {
@@ -61,7 +61,7 @@ inline const char* bson_element_fieldname(bson_element_ref __restrict e)
 /**
  * Get size of the field of BSON element
  */
-inline size_t bson_element_fieldnamesize(bson_element_ref __restrict e)
+static __inline__ size_t bson_element_fieldnamesize(bson_element_ref __restrict e)
 {
     return strlen(bson_element_fieldname(e)) + 1;
 }
@@ -69,7 +69,7 @@ inline size_t bson_element_fieldnamesize(bson_element_ref __restrict e)
 /**
  * Get Raw data of BSON element value
  */
-inline const char* bson_element_value(bson_element_ref __restrict e)
+static __inline__ const char* bson_element_value(bson_element_ref __restrict e)
 {
     if(bson_element_type(e) == bson_type_eoo)
     {
