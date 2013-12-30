@@ -90,7 +90,7 @@ static __inline__ cpl_array_ref cpl_array_create_copy(cpl_array_ref __restrict o
  */
 static __inline__ void* cpl_array_get_p(cpl_array_ref __restrict a, size_t i)
 {
-    if(i < cpl_array_count(a))
+    if(i < a->nreserv)
         return cpl_array_data(a, char) + i * a->szelem;
     return 0;
 }

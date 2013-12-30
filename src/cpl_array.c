@@ -55,16 +55,20 @@ int cpl_array_push_back_p(cpl_array_ref a, void* p, size_t sz)
         nreserv *= 2;
     }
     
-    /* Try to reallocate the buffer */
-    void* ptr = realloc(a->data, nreserv * a->szelem);
-    if(!ptr)
+    if(nreserv > a->nreserv)
     {
-        return _CPL_NOMEM;
+    
+        /* Try to reallocate the buffer */
+        void* ptr = realloc(a->data, nreserv * a->szelem);
+        if(!ptr)
+        {
+            return _CPL_NOMEM;
+        }
+        a->data = ptr;
+        a->nreserv = nreserv;
     }
-    a->data = ptr;
-    a->nreserv = nreserv;
-    memcpy(cpl_array_get_p(a, cpl_array_count(a) - 1), p, sz);
-    a->count += new_count;
+    memcpy(cpl_array_get_p(a, cpl_array_count(a)), p, sz);
+    a->count = new_count;
     
     return _CPL_OK;
 }

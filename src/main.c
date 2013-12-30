@@ -44,7 +44,31 @@ int main(int argc, char* argv[])
     puts(representation);
     free(representation);
     
+    cpl_array_ref a = cpl_array_create(sizeof(int), 4);
     
+    int i = 0;
+    cpl_array_push_back(a, i);
+    i = 1;
+    cpl_array_push_back(a, i);
+    i = 2;
+    cpl_array_push_back(a, i);
+    i = 3;
+    cpl_array_push_back(a, i);
+    i = 4;
+    cpl_array_push_back(a, i);
+    i = 5;
+    cpl_array_push_back(a, i);
+    i = 6;
+    cpl_array_push_back(a, i);
+    i = 7;
+    cpl_array_push_back(a, i);
+    
+    int* arr = cpl_array_data(a, int);
+    for (int k = 0; k < cpl_array_count(a); ++k) {
+        printf("a[%d] = %d\n", k, arr[k]);
+    }
+    
+    cpl_array_destroy(a);
     
     return EXIT_SUCCESS;
 }
