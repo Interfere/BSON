@@ -23,7 +23,7 @@
 
 #include "random.h"
 
-#include <Security/Security.h>
+#include <Security/SecRandom.h>
 
 #if !defined(__APPLE__)
 #error "This file must be used only for Mac OS X"
