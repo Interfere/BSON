@@ -26,6 +26,7 @@
 
 #include "bsontypes.h"
 
+#include <stdlib.h>
 #include <string.h>
 
 /**
@@ -34,8 +35,26 @@
 typedef struct bson_element* bson_element_ref;
 struct bson_element
 {
-    char        data[1];    /* Raw Data of an element */
+    const char*     data;       /* Raw Data of an element */
 };
+
+/**
+ * Creates an empty BSON element
+ */
+extern bson_element_ref bson_element_create();
+
+/**
+ * Creates BSON element with given data
+ */
+extern bson_element_ref bson_element_create_with_data(const char *d);
+
+/**
+ * Destructs BSON element
+ */
+static __inline__ void bson_element_destroy(bson_element_ref __restrict e)
+{
+    free(e);
+}
 
 /**
  * Get type of BSON element
@@ -61,10 +80,7 @@ static __inline__ const char* bson_element_fieldname(bson_element_ref __restrict
 /**
  * Get size of the field of BSON element
  */
-static __inline__ size_t bson_element_fieldnamesize(bson_element_ref __restrict e)
-{
-    return strlen(bson_element_fieldname(e)) + 1;
-}
+extern size_t bson_element_fieldnamesize(bson_element_ref e);
 
 /**
  * Get Raw data of BSON element value

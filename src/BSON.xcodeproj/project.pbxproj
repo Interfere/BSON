@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6C817028187180E60036F1FF /* bsonelement.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C817027187180E60036F1FF /* bsonelement.c */; };
+		6C81702B187192A00036F1FF /* bsondocument.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C81702A187192A00036F1FF /* bsondocument.c */; };
 		6CD537A3186DC2DC007F0232 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CD53792186DC17D007F0232 /* main.c */; };
 		6CD537AC186DC377007F0232 /* libBSON.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6CD537A8186DC330007F0232 /* libBSON.a */; };
 		7109802F186E01560017C395 /* atomic_osx.c in Sources */ = {isa = PBXBuildFile; fileRef = 7109802E186E01560017C395 /* atomic_osx.c */; };
@@ -38,6 +40,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		6C817027187180E60036F1FF /* bsonelement.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = bsonelement.c; sourceTree = "<group>"; };
+		6C8170291871907A0036F1FF /* bsondocument.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = bsondocument.h; sourceTree = "<group>"; };
+		6C81702A187192A00036F1FF /* bsondocument.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = bsondocument.c; sourceTree = "<group>"; };
 		6CD53792186DC17D007F0232 /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
 		6CD53793186DC1A3007F0232 /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
 		6CD53794186DC1A3007F0232 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = text; name = README.md; path = ../README.md; sourceTree = "<group>"; };
@@ -89,8 +94,11 @@
 			isa = PBXGroup;
 			children = (
 				6CD53792186DC17D007F0232 /* main.c */,
-				6CD537AF186DC3B3007F0232 /* bsontypes.h */,
+				6C8170291871907A0036F1FF /* bsondocument.h */,
+				6C81702A187192A00036F1FF /* bsondocument.c */,
 				6CD537B2186DCAED007F0232 /* bsonelement.h */,
+				6C817027187180E60036F1FF /* bsonelement.c */,
+				6CD537AF186DC3B3007F0232 /* bsontypes.h */,
 				711EB499186DEADA00A9239A /* oid.h */,
 				711EB49A186DF6C400A9239A /* oid.c */,
 				711EB49C186DFA7600A9239A /* random.h */,
@@ -205,8 +213,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6C81702B187192A00036F1FF /* bsondocument.c in Sources */,
 				711EB49E186DFBC600A9239A /* random_osx.c in Sources */,
 				7109802F186E01560017C395 /* atomic_osx.c in Sources */,
+				6C817028187180E60036F1FF /* bsonelement.c in Sources */,
 				711EB49B186DF6C400A9239A /* oid.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
