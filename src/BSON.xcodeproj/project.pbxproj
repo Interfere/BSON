@@ -43,6 +43,7 @@
 		6C817027187180E60036F1FF /* bsonelement.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = bsonelement.c; sourceTree = "<group>"; };
 		6C8170291871907A0036F1FF /* bsondocument.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = bsondocument.h; sourceTree = "<group>"; };
 		6C81702A187192A00036F1FF /* bsondocument.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = bsondocument.c; sourceTree = "<group>"; };
+		6C81702C1871D3FA0036F1FF /* cpl_array.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = cpl_array.h; sourceTree = "<group>"; };
 		6CD53792186DC17D007F0232 /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
 		6CD53793186DC1A3007F0232 /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
 		6CD53794186DC1A3007F0232 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = text; name = README.md; path = ../README.md; sourceTree = "<group>"; };
@@ -79,6 +80,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		6C81702D1871D4040036F1FF /* CPL */ = {
+			isa = PBXGroup;
+			children = (
+				6C81702C1871D3FA0036F1FF /* cpl_array.h */,
+			);
+			name = CPL;
+			sourceTree = "<group>";
+		};
 		6CBCF619186DC0B800E7E985 = {
 			isa = PBXGroup;
 			children = (
@@ -93,6 +102,7 @@
 		6CD53791186DC16B007F0232 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				6C81702D1871D4040036F1FF /* CPL */,
 				6CD53792186DC17D007F0232 /* main.c */,
 				6C8170291871907A0036F1FF /* bsondocument.h */,
 				6C81702A187192A00036F1FF /* bsondocument.c */,
