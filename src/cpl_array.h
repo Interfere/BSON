@@ -30,19 +30,15 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include "cpl_region.h"
 
 #define _CPL_DEFAULT_ARRAY_SIZE     64
-
-#define _CPL_OK                     0
-#define _CPL_INVALID_ARG            1
-#define _CPL_NOMEM                  2
 
 struct cpl_array
 {
     size_t          szelem;     /* size of an element */
-    size_t          nreserv;    /* reserved size */
     size_t          count;      /* count of elements */
-    void*           data;
+    cpl_region_t    region;
 };
 typedef struct cpl_array* cpl_array_ref;
 
@@ -61,10 +57,10 @@ cpl_array_ref cpl_array_create(size_t sz, size_t nreserv);
  */
 static __inline__ cpl_array_ref cpl_array_create_copy(cpl_array_ref __restrict o)
 {
-    cpl_array_ref a = cpl_array_create(o->szelem, o->nreserv);
+    cpl_array_ref a = cpl_array_create(o->szelem, o->region.alloc/o->szelem);
     if(a)
     {
-        memcpy(a->data, o->data, o->count);
+        cpl_region_append_region(&a->region, &o->region);
         a->count = o->count;
     }
     return a;
@@ -73,7 +69,7 @@ static __inline__ cpl_array_ref cpl_array_create_copy(cpl_array_ref __restrict o
 /*
  * Destroys an array.
  */
-#define cpl_array_destroy(a)            free((a)->data); free(a)
+#define cpl_array_destroy(a)            cpl_region_deinit(&(a)->region);free(a)
 
 /*
  * Count of elements in array
@@ -83,14 +79,14 @@ static __inline__ cpl_array_ref cpl_array_create_copy(cpl_array_ref __restrict o
 /*
  * Get raw pointer of elements.
  */
-#define cpl_array_data(a, type)         (type *)((a)->data)
+#define cpl_array_data(a, type)         (type *)((a)->region.data)
 
 /*
  * Get access of an element.
  */
 static __inline__ void* cpl_array_get_p(cpl_array_ref __restrict a, size_t i)
 {
-    if(i < a->nreserv)
+    if(i * a->szelem < a->region.alloc)
         return cpl_array_data(a, char) + i * a->szelem;
     return 0;
 }

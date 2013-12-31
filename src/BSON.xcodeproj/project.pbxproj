@@ -16,6 +16,7 @@
 		711EB49B186DF6C400A9239A /* oid.c in Sources */ = {isa = PBXBuildFile; fileRef = 711EB49A186DF6C400A9239A /* oid.c */; };
 		711EB49E186DFBC600A9239A /* random_osx.c in Sources */ = {isa = PBXBuildFile; fileRef = 711EB49D186DFBC600A9239A /* random_osx.c */; };
 		715C61351871F23A003BDD1C /* cpl_array.c in Sources */ = {isa = PBXBuildFile; fileRef = 715C61341871F23A003BDD1C /* cpl_array.c */; };
+		715C61391872C0A5003BDD1C /* cpl_region.c in Sources */ = {isa = PBXBuildFile; fileRef = 715C61381872C0A5003BDD1C /* cpl_region.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -60,6 +61,10 @@
 		711EB49C186DFA7600A9239A /* random.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = random.h; sourceTree = "<group>"; };
 		711EB49D186DFBC600A9239A /* random_osx.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = random_osx.c; sourceTree = "<group>"; };
 		715C61341871F23A003BDD1C /* cpl_array.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cpl_array.c; sourceTree = "<group>"; };
+		715C61361872B12A003BDD1C /* bsondocumentbuilder.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = bsondocumentbuilder.h; sourceTree = "<group>"; };
+		715C61371872BC66003BDD1C /* cpl_region.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = cpl_region.h; sourceTree = "<group>"; };
+		715C61381872C0A5003BDD1C /* cpl_region.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cpl_region.c; sourceTree = "<group>"; };
+		715C613A1872C49B003BDD1C /* cpl_error.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = cpl_error.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -85,8 +90,11 @@
 		6C81702D1871D4040036F1FF /* CPL */ = {
 			isa = PBXGroup;
 			children = (
+				715C613A1872C49B003BDD1C /* cpl_error.h */,
 				6C81702C1871D3FA0036F1FF /* cpl_array.h */,
 				715C61341871F23A003BDD1C /* cpl_array.c */,
+				715C61371872BC66003BDD1C /* cpl_region.h */,
+				715C61381872C0A5003BDD1C /* cpl_region.c */,
 			);
 			name = CPL;
 			sourceTree = "<group>";
@@ -109,6 +117,7 @@
 				6CD53792186DC17D007F0232 /* main.c */,
 				6C8170291871907A0036F1FF /* bsondocument.h */,
 				6C81702A187192A00036F1FF /* bsondocument.c */,
+				715C61361872B12A003BDD1C /* bsondocumentbuilder.h */,
 				6CD537B2186DCAED007F0232 /* bsonelement.h */,
 				6C817027187180E60036F1FF /* bsonelement.c */,
 				6CD537AF186DC3B3007F0232 /* bsontypes.h */,
@@ -227,6 +236,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				6C81702B187192A00036F1FF /* bsondocument.c in Sources */,
+				715C61391872C0A5003BDD1C /* cpl_region.c in Sources */,
 				711EB49E186DFBC600A9239A /* random_osx.c in Sources */,
 				7109802F186E01560017C395 /* atomic_osx.c in Sources */,
 				6C817028187180E60036F1FF /* bsonelement.c in Sources */,

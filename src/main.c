@@ -25,6 +25,7 @@
 #include <stdio.h>
 #include "oid.h"
 #include "cpl_array.h"
+#include "bsondocumentbuilder.h"
 
 int main(int argc, char* argv[])
 {

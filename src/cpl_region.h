@@ -21,37 +21,34 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include "cpl_array.h"
-#include "cpl_error.h"
+/*
+ * C Primitives Library. Region of RAM (aka memory buffer) implementation.
+ */
 
-cpl_array_ref cpl_array_create(size_t sz, size_t nreserv)
+#ifndef _CPL_REGION_H_
+#define _CPL_REGION_H_
+
+#include <stdlib.h>
+
+typedef struct cpl_region cpl_region_t;
+typedef struct cpl_region* cpl_region_ref;
+struct cpl_region
 {
-    cpl_array_ref a = (cpl_array_ref)malloc(sizeof(struct cpl_array));
-    if(a)
-    {
-        a->szelem = sz;
-        a->count = 0;
-        int res = cpl_region_init(&a->region, sz * nreserv);
-        if(res != _CPL_OK)
-        {
-            free(a);
-            a = 0;
-        }
-    }
-    return a;
-}
+    size_t      alloc;
+    size_t      offset;
+    void        *data;
+};
+
+cpl_region_ref cpl_region_create(size_t sz);
+int cpl_region_init(cpl_region_ref __restrict r, size_t sz);
+
+#define cpl_region_create_default() cpl_region_create(0)
+
+#define cpl_region_deinit(r)        free((r)->data)
+#define cpl_region_destroy(r)       free((r)->data);free(r)
+
+int cpl_region_append_data(cpl_region_ref __restrict r, void* __restrict data, size_t sz);
+#define cpl_region_append_region(r, o) cpl_region_append_data(r, (o)->data, (o)->offset)
 
 
-int cpl_array_push_back_p(cpl_array_ref a, void* p, size_t sz)
-{
-    /* Size of buffer should be at least size of an element */
-    if(sz < a->szelem) return _CPL_INVALID_ARG;
-    
-    /* get new count of elements in array */
-    size_t count = sz / a->szelem;
-    
-    cpl_region_append_data(&a->region, p, count * a->szelem);
-    a->count += count;
-    
-    return _CPL_OK;
-}
+#endif // _CPL_REGION_H_

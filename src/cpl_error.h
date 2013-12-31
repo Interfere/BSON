@@ -21,37 +21,11 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include "cpl_array.h"
-#include "cpl_error.h"
+#ifndef _CPL_ERROR_H_
+#define _CPL_ERROR_H_
 
-cpl_array_ref cpl_array_create(size_t sz, size_t nreserv)
-{
-    cpl_array_ref a = (cpl_array_ref)malloc(sizeof(struct cpl_array));
-    if(a)
-    {
-        a->szelem = sz;
-        a->count = 0;
-        int res = cpl_region_init(&a->region, sz * nreserv);
-        if(res != _CPL_OK)
-        {
-            free(a);
-            a = 0;
-        }
-    }
-    return a;
-}
+#define _CPL_OK                     0
+#define _CPL_INVALID_ARG            1
+#define _CPL_NOMEM                  2
 
-
-int cpl_array_push_back_p(cpl_array_ref a, void* p, size_t sz)
-{
-    /* Size of buffer should be at least size of an element */
-    if(sz < a->szelem) return _CPL_INVALID_ARG;
-    
-    /* get new count of elements in array */
-    size_t count = sz / a->szelem;
-    
-    cpl_region_append_data(&a->region, p, count * a->szelem);
-    a->count += count;
-    
-    return _CPL_OK;
-}
+#endif // _CPL_ERROR_H_
