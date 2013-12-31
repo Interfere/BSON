@@ -71,7 +71,7 @@ int cpl_region_init(cpl_region_ref __restrict r, size_t sz)
     return _CPL_OK;
 }
 
-int cpl_region_append_data(cpl_region_ref __restrict r, void* __restrict data, size_t sz)
+int cpl_region_append_data(cpl_region_ref __restrict r, const void* __restrict data, size_t sz)
 {
     assert(r);
     assert(data && sz);
@@ -85,7 +85,7 @@ int cpl_region_append_data(cpl_region_ref __restrict r, void* __restrict data, s
     
     if(alloc > r->alloc)
     {
-        void *ptr = realloc(r, alloc);
+        void *ptr = realloc(r->data, alloc);
         if(!ptr)
         {
             return _CPL_NOMEM;

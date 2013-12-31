@@ -26,11 +26,12 @@
 #include "oid.h"
 #include "cpl_array.h"
 #include "bsondocumentbuilder.h"
+#include "bsondocument.h"
 
-int main(int argc, char* argv[])
+static inline void test_oid()
 {
     bson_oid_ref oid = bson_oid_create();
-    bson_oid_init_sequential(oid);
+    bson_oid_init(oid);
     char* representation = bson_oid_string_create(oid);
     bson_oid_destroy(oid);
     
@@ -44,7 +45,10 @@ int main(int argc, char* argv[])
     
     puts(representation);
     free(representation);
-    
+}
+
+static inline void test_cpl_array()
+{
     cpl_array_ref a = cpl_array_create(sizeof(int), 4);
     
     int i = 0;
@@ -70,6 +74,35 @@ int main(int argc, char* argv[])
     }
     
     cpl_array_destroy(a);
+}
+
+static inline void test_builder()
+{
+    bson_document_builder_ref b = bson_document_builder_create();
+    
+    bson_oid_ref oid = bson_oid_create();
+    bson_oid_init(oid);
+    bson_document_builder_append_oid(b, "_id", oid);
+    bson_oid_destroy(oid);
+    
+    bson_document_builder_append_str(b, "title", "test_table");
+    bson_document_builder_append_b(b, "isActive", 1);
+    bson_document_builder_append_i(b, "cols", 6);
+    
+    bson_document_ref d = bson_document_builder_finalize(b);
+    int32_t size_of_d = bson_document_size(d);
+    bson_document_destroy(d);
+    
+    printf("sizeof d: %d\n", size_of_d);
+}
+
+int main(int argc, char* argv[])
+{
+    test_oid();
+    
+    test_cpl_array();
+    
+    test_builder();
     
     return EXIT_SUCCESS;
 }

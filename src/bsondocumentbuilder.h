@@ -42,12 +42,13 @@ struct bson_document_builder
 /*
  * Default constructor
  */
-static __inline__ bson_document_builder_ref bson_document_builder_create()
+inline bson_document_builder_ref bson_document_builder_create()
 {
     bson_document_builder_ref bld = (bson_document_builder_ref)malloc(sizeof(struct bson_document_builder));
     if(bld)
     {
         cpl_region_init(&bld->r, 0);
+        bld->r.offset = sizeof(int32_t);
     }
     return bld;
 }
@@ -55,12 +56,21 @@ static __inline__ bson_document_builder_ref bson_document_builder_create()
 /*
  * Default destructor. Destroys the builder and the buffer.
  */
-#define bson_document_builder_destroy(bld) cpl_region_deinit(&(bld)->r)
+#define bson_document_builder_destroy(bld) cpl_region_deinit(&(bld)->r);free(bld)
 
 /*
  * Common destructor. Finalize and returns document. Frees builder.
  */
-bson_document_ref bson_document_builder_finalize(bson_document_builder_ref __restrict bld);
+inline bson_document_ref bson_document_builder_finalize(bson_document_builder_ref __restrict bld)
+{
+    bson_type_t type = bson_type_eoo;
+    cpl_region_append_data(&bld->r, &type, sizeof(type));
+    *(int32_t*)bld->r.data = (int32_t)(bld->r.offset - sizeof(int32_t));
+    
+    bson_document_ref doc = bson_document_create_with_data(bld->r.data);
+    free(bld);
+    return doc;
+}
 
 /*
  * Append routines
@@ -71,40 +81,126 @@ void bson_document_builder_append_doc(bson_document_builder_ref __restrict bld,
                                       const char* __restrict k,
                                       const bson_document_ref __restrict doc);
 // TODO: void bson_document_builder_append_arr
-void bson_document_builder_append_b(bson_document_builder_ref __restrict bld,
-                                    const char* __restrict k, _Bool b);
-void bson_document_builder_append_i(bson_document_builder_ref __restrict bld,
-                                    const char* __restrict k, int i);
-void bson_document_builder_append_l(bson_document_builder_ref __restrict bld,
-                                    const char* __restrict k, int64_t l);
-void bson_document_builder_append_d(bson_document_builder_ref __restrict bld,
-                                    const char* __restrict k, double d);
-void bson_document_builder_append_oid(bson_document_builder_ref __restrict bld,
+inline void bson_document_builder_append_b(bson_document_builder_ref __restrict bld,
+                                    const char* __restrict k, char b)
+{
+    bson_type_t type = bson_type_bool;
+    cpl_region_append_data(&bld->r, &type, sizeof(type));
+    cpl_region_append_data(&bld->r, k, strlen(k)+1);
+    cpl_region_append_data(&bld->r, &b, sizeof(b));
+}
+
+inline void bson_document_builder_append_i(bson_document_builder_ref __restrict bld,
+                                    const char* __restrict k, int32_t i)
+{
+    bson_type_t type = bson_type_int;
+    cpl_region_append_data(&bld->r, &type, sizeof(type));
+    cpl_region_append_data(&bld->r, k, strlen(k)+1);
+    cpl_region_append_data(&bld->r, &i, sizeof(i));
+}
+
+inline void bson_document_builder_append_l(bson_document_builder_ref __restrict bld,
+                                    const char* __restrict k, int64_t l)
+{
+    bson_type_t type = bson_type_long;
+    cpl_region_append_data(&bld->r, &type, sizeof(type));
+    cpl_region_append_data(&bld->r, k, strlen(k)+1);
+    cpl_region_append_data(&bld->r, &l, sizeof(l));
+}
+
+inline void bson_document_builder_append_d(bson_document_builder_ref __restrict bld,
+                                    const char* __restrict k, double d)
+{
+    bson_type_t type = bson_type_float;
+    cpl_region_append_data(&bld->r, &type, sizeof(type));
+    cpl_region_append_data(&bld->r, k, strlen(k)+1);
+    cpl_region_append_data(&bld->r, &d, sizeof(d));
+}
+
+inline void bson_document_builder_append_oid(bson_document_builder_ref __restrict bld,
                                       const char* __restrict k,
-                                      const bson_oid_ref __restrict oid);
-void bson_document_builder_append_date(bson_document_builder_ref __restrict bld,
-                                       const char* __restrict k, int64_t dt);
-void bson_document_builder_append_str(bson_document_builder_ref __restrict bld,
+                                      const bson_oid_ref __restrict oid)
+{
+    bson_type_t type = bson_type_oid;
+    cpl_region_append_data(&bld->r, &type, sizeof(type));
+    cpl_region_append_data(&bld->r, k, strlen(k)+1);
+    cpl_region_append_data(&bld->r, oid->data, sizeof(oid->data));
+}
+
+inline void bson_document_builder_append_date(bson_document_builder_ref __restrict bld,
+                                       const char* __restrict k, int64_t dt)
+{
+    bson_type_t type = bson_type_date;
+    cpl_region_append_data(&bld->r, &type, sizeof(type));
+    cpl_region_append_data(&bld->r, k, strlen(k)+1);
+    cpl_region_append_data(&bld->r, &dt, sizeof(dt));
+}
+
+inline void bson_document_builder_append_str(bson_document_builder_ref __restrict bld,
                                       const char* __restrict k,
-                                      const char* __restrict str);
-void bson_document_builder_append_js(bson_document_builder_ref __restrict bld,
+                                      const char* __restrict str)
+{
+    bson_type_t type = bson_type_string;
+    cpl_region_append_data(&bld->r, &type, sizeof(type));
+    cpl_region_append_data(&bld->r, k, strlen(k)+1);
+    
+    int32_t size = (int32_t)strlen(str) + 1;
+    cpl_region_append_data(&bld->r, &size, sizeof(size));
+    cpl_region_append_data(&bld->r, str, size);
+}
+
+inline void bson_document_builder_append_js(bson_document_builder_ref __restrict bld,
                                      const char* __restrict k,
-                                     const char* __restrict js);
-void bson_document_builder_append_null(bson_document_builder_ref __restrict bld,
-                                       const char* __restrict k);
+                                     const char* __restrict js)
+{
+    bson_type_t type = bson_type_code;
+    cpl_region_append_data(&bld->r, &type, sizeof(type));
+    cpl_region_append_data(&bld->r, k, strlen(k)+1);
+    
+    int32_t size = (int32_t)strlen(js) + 1;
+    cpl_region_append_data(&bld->r, &size, sizeof(size));
+    cpl_region_append_data(&bld->r, js, size);
+}
+
+inline void bson_document_builder_append_null(bson_document_builder_ref __restrict bld,
+                                       const char* __restrict k)
+{
+    bson_type_t type = bson_type_null;
+    cpl_region_append_data(&bld->r, &type, sizeof(type));
+    cpl_region_append_data(&bld->r, k, strlen(k)+1);
+}
 
 /* 
  * Append a regular expression value
  * @param regex the regular expression pattern
  * @param regex options such as "i" or "g"
  */
-void bson_document_builder_append_regex(bson_document_builder_ref __restrict bld,
+inline void bson_document_builder_append_regex(bson_document_builder_ref __restrict bld,
                                         const char* __restrict k,
                                         const char* __restrict regex,
-                                        const char* __restrict flags);
-void bson_document_builder_append_bin(bson_document_builder_ref __restrict bld,
+                                        const char* __restrict flags)
+{
+    bson_type_t type = bson_type_regex;
+    cpl_region_append_data(&bld->r, &type, sizeof(type));
+    cpl_region_append_data(&bld->r, k, strlen(k)+1);
+    cpl_region_append_data(&bld->r, regex, strlen(regex)+1);
+    if(!flags)
+    {
+        flags = "";
+    }
+    cpl_region_append_data(&bld->r, flags, strlen(flags) + 1);
+}
+
+inline void bson_document_builder_append_bin(bson_document_builder_ref __restrict bld,
                                       bson_subtype_t t, void* __restrict d,
-                                      size_t sz);
+                                      int32_t sz)
+{
+    bson_type_t type = bson_type_bindata;
+    cpl_region_append_data(&bld->r, &type, sizeof(type));
+    cpl_region_append_data(&bld->r, &sz, sizeof(sz));
+    cpl_region_append_data(&bld->r, &t, sizeof(t));
+    cpl_region_append_data(&bld->r, d, sz);
+}
 
 
 #endif // _BSON_BSONDOCUMENTBUILDER_H_

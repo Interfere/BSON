@@ -72,7 +72,7 @@ enum bson_types
     bson_type_dbpointer,
     
     /* deprecated / use CodeWScope */
-    bson_tyope_code,
+    bson_type_code,
     
     /* deprecated / symbol */
     bson_type_symbol,

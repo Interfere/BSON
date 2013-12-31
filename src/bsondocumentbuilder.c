@@ -21,34 +21,18 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-/*
- * C Primitives Library. Region of RAM (aka memory buffer) implementation.
- */
+#include "bsondocumentbuilder.h"
 
-#ifndef _CPL_REGION_H_
-#define _CPL_REGION_H_
+extern inline bson_document_builder_ref bson_document_builder_create();
+extern inline bson_document_ref bson_document_builder_finalize(bson_document_builder_ref __restrict bld);
 
-#include <stdlib.h>
-
-typedef struct cpl_region cpl_region_t;
-typedef struct cpl_region* cpl_region_ref;
-struct cpl_region
-{
-    size_t      alloc;
-    size_t      offset;
-    void        *data;
-};
-
-cpl_region_ref cpl_region_create(size_t sz);
-int cpl_region_init(cpl_region_ref __restrict r, size_t sz);
-
-#define cpl_region_create_default() cpl_region_create(0)
-
-#define cpl_region_deinit(r)        free((r)->data)
-#define cpl_region_destroy(r)       free((r)->data);free(r)
-
-int cpl_region_append_data(cpl_region_ref __restrict r, const void* __restrict data, size_t sz);
-#define cpl_region_append_region(r, o) cpl_region_append_data(r, (o)->data, (o)->offset)
-
-
-#endif // _CPL_REGION_H_
+extern inline void bson_document_builder_append_b(bson_document_builder_ref __restrict bld,
+                                                  const char* __restrict k, char b);
+extern inline void bson_document_builder_append_i(bson_document_builder_ref __restrict bld,
+                                                  const char* __restrict k, int32_t i);
+extern inline void bson_document_builder_append_oid(bson_document_builder_ref __restrict bld,
+                                             const char* __restrict k,
+                                             const bson_oid_ref __restrict oid);
+extern inline void bson_document_builder_append_str(bson_document_builder_ref __restrict bld,
+                                                    const char* __restrict k,
+                                                    const char* __restrict str);

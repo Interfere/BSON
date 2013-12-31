@@ -17,6 +17,7 @@
 		711EB49E186DFBC600A9239A /* random_osx.c in Sources */ = {isa = PBXBuildFile; fileRef = 711EB49D186DFBC600A9239A /* random_osx.c */; };
 		715C61351871F23A003BDD1C /* cpl_array.c in Sources */ = {isa = PBXBuildFile; fileRef = 715C61341871F23A003BDD1C /* cpl_array.c */; };
 		715C61391872C0A5003BDD1C /* cpl_region.c in Sources */ = {isa = PBXBuildFile; fileRef = 715C61381872C0A5003BDD1C /* cpl_region.c */; };
+		715C613C1872D169003BDD1C /* bsondocumentbuilder.c in Sources */ = {isa = PBXBuildFile; fileRef = 715C613B1872D169003BDD1C /* bsondocumentbuilder.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -65,6 +66,7 @@
 		715C61371872BC66003BDD1C /* cpl_region.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = cpl_region.h; sourceTree = "<group>"; };
 		715C61381872C0A5003BDD1C /* cpl_region.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cpl_region.c; sourceTree = "<group>"; };
 		715C613A1872C49B003BDD1C /* cpl_error.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = cpl_error.h; sourceTree = "<group>"; };
+		715C613B1872D169003BDD1C /* bsondocumentbuilder.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = bsondocumentbuilder.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -118,6 +120,7 @@
 				6C8170291871907A0036F1FF /* bsondocument.h */,
 				6C81702A187192A00036F1FF /* bsondocument.c */,
 				715C61361872B12A003BDD1C /* bsondocumentbuilder.h */,
+				715C613B1872D169003BDD1C /* bsondocumentbuilder.c */,
 				6CD537B2186DCAED007F0232 /* bsonelement.h */,
 				6C817027187180E60036F1FF /* bsonelement.c */,
 				6CD537AF186DC3B3007F0232 /* bsontypes.h */,
@@ -241,6 +244,7 @@
 				7109802F186E01560017C395 /* atomic_osx.c in Sources */,
 				6C817028187180E60036F1FF /* bsonelement.c in Sources */,
 				711EB49B186DF6C400A9239A /* oid.c in Sources */,
+				715C613C1872D169003BDD1C /* bsondocumentbuilder.c in Sources */,
 				715C61351871F23A003BDD1C /* cpl_array.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
