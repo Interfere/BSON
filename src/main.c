@@ -71,6 +71,8 @@ static inline void test_cpl_array()
     int* arr = cpl_array_data(a, int);
     for (int k = 0; k < cpl_array_count(a); ++k) {
         printf("a[%d] = %d\n", k, arr[k]);
+        int it = cpl_array_get(a, k, int);
+        printf("b[%d] = %d\n", k, it);
     }
     
     cpl_array_destroy(a);
