@@ -26,8 +26,8 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include <unistd.h>
-#include "random.h"
-#include "atomic.h"
+#include <cpl_random.h>
+#include <cpl_atomic.h>
 
 /*********************** Private ObjectID properties **************************/
 static int64_t s_sequential_inc = 0;
@@ -35,7 +35,7 @@ static int64_t s_sequential_inc = 0;
 /*********************** Private ObjectID interface ***************************/
 static void bson_oid_generate_machine_and_pid(struct machine_and_pid *__restrict p)
 {
-    *(int64_t *)p = random_generate_next64();
+    *(int64_t *)p = cpl_random_generate_next64();
     pid_t _pid = getpid();
     p->pid ^= (uint16_t)_pid;
     *(uint16_t *)&p->machine_number[1] ^= _pid >> 16;
@@ -51,7 +51,7 @@ void bson_oid_init(bson_oid_ref __restrict oid)
         pthread_mutex_lock(&mutex);
         if(inc == 0)
         {
-            inc = random_generate_next32();
+            inc = cpl_random_generate_next32();
             bson_oid_generate_machine_and_pid(&machine_and_pid);
         }
         pthread_mutex_unlock(&mutex);
@@ -69,7 +69,7 @@ void bson_oid_init(bson_oid_ref __restrict oid)
     oid->machine_and_pid = machine_and_pid;
     
     {
-        const int32_t new_inc = atomic_increment(&inc);
+        const int32_t new_inc = cpl_atomic_increment(&inc);
         const uint8_t *T = (const uint8_t *)&new_inc;
         oid->inc[0] = T[2];
         oid->inc[1] = T[1];
@@ -89,7 +89,7 @@ void bson_oid_init_sequential(bson_oid_ref __restrict oid)
     }
     
     {
-        const int64_t new_inc = atomic_increment64(&s_sequential_inc);
+        const int64_t new_inc = cpl_atomic_increment64(&s_sequential_inc);
         const uint8_t *T = (const uint8_t *)&new_inc;
         oid->data[4] = T[7];
         oid->data[5] = T[6];
