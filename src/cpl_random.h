@@ -21,24 +21,15 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include "random.h"
+#ifndef _CPL_RANDOM_H_
+#define _CPL_RANDOM_H_
 
-#include <Security/SecRandom.h>
+#include <stdint.h>
 
-#if !defined(__APPLE__)
-#error "This file must be used only for Mac OS X"
-#endif
+/**
+ * Interface for platform-specific random number generator
+ */
+int32_t cpl_random_generate_next32();
+int64_t cpl_random_generate_next64();
 
-int32_t random_generate_next32()
-{
-    int32_t random_num;
-    SecRandomCopyBytes(kSecRandomDefault, sizeof(random_num), (uint8_t *)&random_num);
-    return random_num;
-}
-
-int64_t random_generate_next64()
-{
-    int64_t random_num;
-    SecRandomCopyBytes(kSecRandomDefault, sizeof(random_num), (uint8_t *)&random_num);
-    return random_num;
-}
+#endif // _CPL_RANDOM_H_

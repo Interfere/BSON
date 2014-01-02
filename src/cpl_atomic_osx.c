@@ -21,12 +21,16 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef _BSON_ATOMIC_H_
-#define _BSON_ATOMIC_H_
+#include "cpl_atomic.h"
 
-#include <stdint.h>
+#include <libkern/OSAtomic.h>
 
-int32_t atomic_increment(volatile int32_t* value);
-int64_t atomic_increment64(volatile int64_t* value);
+int32_t cpl_atomic_increment(volatile int32_t* value)
+{
+    return OSAtomicIncrement32(value);
+}
 
-#endif // _BSON_ATOMIC_H_
+int64_t cpl_atomic_increment64(volatile int64_t* value)
+{
+    return OSAtomicIncrement64(value);
+}

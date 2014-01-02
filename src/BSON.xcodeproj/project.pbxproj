@@ -11,10 +11,10 @@
 		6C81702B187192A00036F1FF /* bsondocument.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C81702A187192A00036F1FF /* bsondocument.c */; };
 		6CD537A3186DC2DC007F0232 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CD53792186DC17D007F0232 /* main.c */; };
 		6CD537AC186DC377007F0232 /* libBSON.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6CD537A8186DC330007F0232 /* libBSON.a */; };
-		7109802F186E01560017C395 /* atomic_osx.c in Sources */ = {isa = PBXBuildFile; fileRef = 7109802E186E01560017C395 /* atomic_osx.c */; };
+		7109802F186E01560017C395 /* cpl_atomic_osx.c in Sources */ = {isa = PBXBuildFile; fileRef = 7109802E186E01560017C395 /* cpl_atomic_osx.c */; };
 		71098031186E0A3F0017C395 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 71098030186E0A3F0017C395 /* Security.framework */; };
 		711EB49B186DF6C400A9239A /* oid.c in Sources */ = {isa = PBXBuildFile; fileRef = 711EB49A186DF6C400A9239A /* oid.c */; };
-		711EB49E186DFBC600A9239A /* random_osx.c in Sources */ = {isa = PBXBuildFile; fileRef = 711EB49D186DFBC600A9239A /* random_osx.c */; };
+		711EB49E186DFBC600A9239A /* cpl_random_osx.c in Sources */ = {isa = PBXBuildFile; fileRef = 711EB49D186DFBC600A9239A /* cpl_random_osx.c */; };
 		715C61351871F23A003BDD1C /* cpl_array.c in Sources */ = {isa = PBXBuildFile; fileRef = 715C61341871F23A003BDD1C /* cpl_array.c */; };
 		715C61391872C0A5003BDD1C /* cpl_region.c in Sources */ = {isa = PBXBuildFile; fileRef = 715C61381872C0A5003BDD1C /* cpl_region.c */; };
 		715C613C1872D169003BDD1C /* bsondocumentbuilder.c in Sources */ = {isa = PBXBuildFile; fileRef = 715C613B1872D169003BDD1C /* bsondocumentbuilder.c */; };
@@ -54,13 +54,13 @@
 		6CD537A8186DC330007F0232 /* libBSON.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libBSON.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		6CD537AF186DC3B3007F0232 /* bsontypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = bsontypes.h; sourceTree = "<group>"; };
 		6CD537B2186DCAED007F0232 /* bsonelement.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = bsonelement.h; sourceTree = "<group>"; };
-		7109802D186E00AC0017C395 /* atomic.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = atomic.h; sourceTree = "<group>"; };
-		7109802E186E01560017C395 /* atomic_osx.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = atomic_osx.c; sourceTree = "<group>"; };
+		7109802D186E00AC0017C395 /* cpl_atomic.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = cpl_atomic.h; sourceTree = "<group>"; };
+		7109802E186E01560017C395 /* cpl_atomic_osx.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cpl_atomic_osx.c; sourceTree = "<group>"; };
 		71098030186E0A3F0017C395 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		711EB499186DEADA00A9239A /* oid.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = oid.h; sourceTree = "<group>"; };
 		711EB49A186DF6C400A9239A /* oid.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = oid.c; sourceTree = "<group>"; };
-		711EB49C186DFA7600A9239A /* random.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = random.h; sourceTree = "<group>"; };
-		711EB49D186DFBC600A9239A /* random_osx.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = random_osx.c; sourceTree = "<group>"; };
+		711EB49C186DFA7600A9239A /* cpl_random.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = cpl_random.h; sourceTree = "<group>"; };
+		711EB49D186DFBC600A9239A /* cpl_random_osx.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cpl_random_osx.c; sourceTree = "<group>"; };
 		715C61341871F23A003BDD1C /* cpl_array.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cpl_array.c; sourceTree = "<group>"; };
 		715C61361872B12A003BDD1C /* bsondocumentbuilder.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = bsondocumentbuilder.h; sourceTree = "<group>"; };
 		715C61371872BC66003BDD1C /* cpl_region.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = cpl_region.h; sourceTree = "<group>"; };
@@ -92,9 +92,13 @@
 		6C81702D1871D4040036F1FF /* CPL */ = {
 			isa = PBXGroup;
 			children = (
+				7109802D186E00AC0017C395 /* cpl_atomic.h */,
+				7109802E186E01560017C395 /* cpl_atomic_osx.c */,
 				715C613A1872C49B003BDD1C /* cpl_error.h */,
 				6C81702C1871D3FA0036F1FF /* cpl_array.h */,
 				715C61341871F23A003BDD1C /* cpl_array.c */,
+				711EB49C186DFA7600A9239A /* cpl_random.h */,
+				711EB49D186DFBC600A9239A /* cpl_random_osx.c */,
 				715C61371872BC66003BDD1C /* cpl_region.h */,
 				715C61381872C0A5003BDD1C /* cpl_region.c */,
 			);
@@ -126,10 +130,6 @@
 				6CD537AF186DC3B3007F0232 /* bsontypes.h */,
 				711EB499186DEADA00A9239A /* oid.h */,
 				711EB49A186DF6C400A9239A /* oid.c */,
-				711EB49C186DFA7600A9239A /* random.h */,
-				711EB49D186DFBC600A9239A /* random_osx.c */,
-				7109802D186E00AC0017C395 /* atomic.h */,
-				7109802E186E01560017C395 /* atomic_osx.c */,
 			);
 			name = src;
 			sourceTree = "<group>";
@@ -240,8 +240,8 @@
 			files = (
 				6C81702B187192A00036F1FF /* bsondocument.c in Sources */,
 				715C61391872C0A5003BDD1C /* cpl_region.c in Sources */,
-				711EB49E186DFBC600A9239A /* random_osx.c in Sources */,
-				7109802F186E01560017C395 /* atomic_osx.c in Sources */,
+				711EB49E186DFBC600A9239A /* cpl_random_osx.c in Sources */,
+				7109802F186E01560017C395 /* cpl_atomic_osx.c in Sources */,
 				6C817028187180E60036F1FF /* bsonelement.c in Sources */,
 				711EB49B186DF6C400A9239A /* oid.c in Sources */,
 				715C613C1872D169003BDD1C /* bsondocumentbuilder.c in Sources */,

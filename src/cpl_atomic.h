@@ -21,15 +21,12 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef _BSON_RANDOM_H_
-#define _BSON_RANDOM_H_
+#ifndef _CPL_ATOMIC_H_
+#define _CPL_ATOMIC_H_
 
 #include <stdint.h>
 
-/**
- * Interface for platform-specific random number generator
- */
-int32_t random_generate_next32();
-int64_t random_generate_next64();
+int32_t cpl_atomic_increment(volatile int32_t* value);
+int64_t cpl_atomic_increment64(volatile int64_t* value);
 
-#endif // _BSON_RANDOM_H_
+#endif // _CPL_ATOMIC_H_

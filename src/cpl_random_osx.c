@@ -21,16 +21,24 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include "atomic.h"
+#include "cpl_random.h"
 
-#include <libkern/OSAtomic.h>
+#include <Security/SecRandom.h>
 
-int32_t atomic_increment(volatile int32_t* value)
+#if !defined(__APPLE__)
+#error "This file must be used only for Mac OS X"
+#endif
+
+int32_t cpl_random_generate_next32()
 {
-    return OSAtomicIncrement32(value);
+    int32_t random_num;
+    SecRandomCopyBytes(kSecRandomDefault, sizeof(random_num), (uint8_t *)&random_num);
+    return random_num;
 }
 
-int64_t atomic_increment64(volatile int64_t* value)
+int64_t cpl_random_generate_next64()
 {
-    return OSAtomicIncrement64(value);
+    int64_t random_num;
+    SecRandomCopyBytes(kSecRandomDefault, sizeof(random_num), (uint8_t *)&random_num);
+    return random_num;
 }
