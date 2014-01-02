@@ -30,7 +30,8 @@
 #include <cpl_atomic.h>
 
 /*********************** Private ObjectID properties **************************/
-static int64_t s_sequential_inc = 0;
+static int64_t s_sequential_inc64 = 0;
+static int32_t s_sequential_inc32 = 0;
 
 /*********************** Private ObjectID interface ***************************/
 static void bson_oid_generate_machine_and_pid(struct machine_and_pid *__restrict p)
@@ -43,20 +44,17 @@ static void bson_oid_generate_machine_and_pid(struct machine_and_pid *__restrict
 
 void bson_oid_init(bson_oid_ref __restrict oid)
 {
-    static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
-    static int32_t inc = 0;
     static struct machine_and_pid machine_and_pid = { 0, 0 };
-    if(inc == 0)
+    static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+    if(machine_and_pid.pid == 0)
     {
         pthread_mutex_lock(&mutex);
-        if(inc == 0)
+        if(machine_and_pid.pid == 0)
         {
-            inc = cpl_random_generate_next32();
             bson_oid_generate_machine_and_pid(&machine_and_pid);
         }
         pthread_mutex_unlock(&mutex);
     }
-    
     {
         const time_t t = time(0);
         const uint8_t* T = (const uint8_t *)&t;
@@ -69,7 +67,7 @@ void bson_oid_init(bson_oid_ref __restrict oid)
     oid->machine_and_pid = machine_and_pid;
     
     {
-        const int32_t new_inc = cpl_atomic_increment(&inc);
+        const int32_t new_inc = cpl_atomic_increment(&s_sequential_inc32);
         const uint8_t *T = (const uint8_t *)&new_inc;
         oid->inc[0] = T[2];
         oid->inc[1] = T[1];
@@ -89,7 +87,7 @@ void bson_oid_init_sequential(bson_oid_ref __restrict oid)
     }
     
     {
-        const int64_t new_inc = cpl_atomic_increment64(&s_sequential_inc);
+        const int64_t new_inc = cpl_atomic_increment64(&s_sequential_inc64);
         const uint8_t *T = (const uint8_t *)&new_inc;
         oid->data[4] = T[7];
         oid->data[5] = T[6];

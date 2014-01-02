@@ -19,7 +19,7 @@
 		71F455291875E4F500FCBA58 /* oid.c in Sources */ = {isa = PBXBuildFile; fileRef = 71F455201875E4F500FCBA58 /* oid.c */; };
 		71F4552A1875E4F500FCBA58 /* oid.h in Headers */ = {isa = PBXBuildFile; fileRef = 71F455211875E4F500FCBA58 /* oid.h */; };
 		71F4552C1875E50900FCBA58 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 71F4552B1875E50900FCBA58 /* main.c */; };
-		71F455301875E5C500FCBA58 /* libcpl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 71F455161875E4B500FCBA58 /* libcpl.a */; };
+		71F455331875E8F500FCBA58 /* libcpl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 71F455161875E4B500FCBA58 /* libcpl.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -44,7 +44,7 @@
 			remoteGlobalIDString = 71F4550F1875DCF600FCBA58;
 			remoteInfo = cpl_ios;
 		};
-		71F4552E1875E5BD00FCBA58 /* PBXContainerItemProxy */ = {
+		71F455311875E8F000FCBA58 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 71F455101875E4B500FCBA58 /* CPL.xcodeproj */;
 			proxyType = 1;
@@ -87,6 +87,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				71F455331875E8F500FCBA58 /* libcpl.a in Frameworks */,
 				71098031186E0A3F0017C395 /* Security.framework in Frameworks */,
 				6CD537AC186DC377007F0232 /* libBSON.a in Frameworks */,
 			);
@@ -96,7 +97,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				71F455301875E5C500FCBA58 /* libcpl.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -193,6 +193,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				71F455321875E8F000FCBA58 /* PBXTargetDependency */,
 				6CD537AE186DC37D007F0232 /* PBXTargetDependency */,
 			);
 			name = "BSON Tests";
@@ -211,7 +212,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				71F4552F1875E5BD00FCBA58 /* PBXTargetDependency */,
 			);
 			name = BSON;
 			productName = BSON;
@@ -295,10 +295,10 @@
 			target = 6CD537A7186DC330007F0232 /* BSON */;
 			targetProxy = 6CD537AD186DC37D007F0232 /* PBXContainerItemProxy */;
 		};
-		71F4552F1875E5BD00FCBA58 /* PBXTargetDependency */ = {
+		71F455321875E8F000FCBA58 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = cpl;
-			targetProxy = 71F4552E1875E5BD00FCBA58 /* PBXContainerItemProxy */;
+			targetProxy = 71F455311875E8F000FCBA58 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
