@@ -24,3 +24,5 @@
 #include "bsondocument.h"
 /****************************** Public Impl ***********************************/
 
+extern inline bson_document_ref bson_document_create();
+extern inline bson_document_ref bson_document_create_with_data(const char *d);

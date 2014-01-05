@@ -26,6 +26,7 @@
 
 #include <stdint.h>
 #include <stdlib.h>
+#include "bsonelement.h"
 
 /**
  * Generic type for bson document
@@ -39,9 +40,9 @@ struct bson_document
 /**
  * Creates empty document
  */
-static __inline__ bson_document_ref bson_document_create()
+inline bson_document_ref bson_document_create()
 {
-    static char p[] = { /* size */5, 0, 0, 0, /* eoo */0 };
+    static const char p[] = { /* size */5, 0, 0, 0, /* eoo */0 };
     bson_document_ref __restrict e = (bson_document_ref)malloc(sizeof(struct bson_document));
     e->data = p;
     return e;
@@ -50,7 +51,7 @@ static __inline__ bson_document_ref bson_document_create()
 /**
  * Creates document with given data
  */
-static __inline__ bson_document_ref bson_document_create_with_data(const char *d)
+inline bson_document_ref bson_document_create_with_data(const char *d)
 {
     bson_document_ref __restrict e = (bson_document_ref)malloc(sizeof(struct bson_document));
     e->data = d;
@@ -66,6 +67,11 @@ static __inline__ bson_document_ref bson_document_create_with_data(const char *d
  * Get size of the document
  */
 #define bson_document_size(doc)             (*(int32_t *)doc->data)
+
+/**
+ * Get first element of the document
+ */
+#define bson_document_get_first(doc)        ((bson_element_ref)((doc)->data+4))
 
 
 #endif // _BSON_BSONDOCUMENT_H_
