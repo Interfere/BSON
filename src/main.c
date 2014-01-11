@@ -92,10 +92,19 @@ static inline void test_builder()
     bson_document_builder_append_i(b, "cols", 6);
     
     bson_document_ref d = bson_document_builder_finalize(b);
-    int32_t size_of_d = bson_document_size(d);
-    bson_document_destroy(d);
+    printf("sizeof d: %d\n", bson_document_size(d));
     
-    printf("sizeof d: %d\n", size_of_d);
+    bson_element_ref el = bson_document_get_first(d);
+    while (bson_element_type(el) != bson_type_eoo) {
+        printf("Element: size=%zu key=%s\n", bson_element_size(el), bson_element_fieldname(el));
+        bson_element_ref tmp = bson_element_create_with_data(el->data + bson_element_size(el));
+        bson_element_destroy(el);
+        el = tmp;
+    }
+    
+    bson_element_destroy(el);
+    
+    bson_document_destroy(d);
 }
 
 int main(int argc, char* argv[])

@@ -23,51 +23,108 @@
 
 #include "bsonelement.h"
 
-/****************************** Private Impl **********************************/
-struct bson_element_internal
-{
-    const char*     data;
-    size_t          fieldNameSize;
-    size_t          totalSize;
-};
-typedef struct bson_element_internal* bson_element_internal_ref;
+#include <assert.h>
+#include "oid.h"
 
 /****************************** Public Impl ***********************************/
-bson_element_ref bson_element_create()
-{
-    static char z = 0;
-    bson_element_internal_ref __restrict e = (bson_element_internal_ref)malloc(sizeof(struct bson_element_internal));
-    e->data = &z;
-    e->fieldNameSize = 0;
-    e->totalSize = 1;
-    return (bson_element_ref)e;
-}
+extern inline size_t bson_element_key_size(bson_element_ref __restrict e);
+extern inline bson_element_ref bson_element_create();
+extern inline const char* bson_element_value(bson_element_ref __restrict e);
+extern inline const char* bson_element_fieldname(bson_element_ref __restrict e);
 
 bson_element_ref bson_element_create_with_data(const char *d)
 {
-    struct bson_element_internal* __restrict e = (struct bson_element_internal*)malloc(sizeof(struct bson_element_internal));
-    e->data = d;
-    if(bson_element_type((bson_element_ref)e) == bson_type_eoo)
+    struct bson_element* __restrict e = (struct bson_element*)malloc(sizeof(struct bson_element));
+    if(e)
     {
-        e->fieldNameSize = 0;
-        e->totalSize = 1;
+        e->data = d;
+        if(bson_element_type(e) == bson_type_eoo)
+        {
+            e->key_size = 0;
+            e->size = 1;
+        }
+        else
+        {
+            e->key_size = -1;
+            e->size = -1;
+        }
     }
-    else
-    {
-        e->fieldNameSize = -1;
-        e->totalSize = -1;
-    }
-    return (bson_element_ref)e;
+    return e;
 }
 
-size_t bson_element_fieldnamesize(bson_element_ref e)
+size_t bson_element_size(bson_element_ref __restrict e)
 {
-    struct bson_element_internal* __restrict internal = (struct bson_element_internal* __restrict)e;
-    
-    if(internal->fieldNameSize == -1)
+    if(e->size == -1)
     {
-        internal->fieldNameSize = strlen(bson_element_fieldname(e)) + 1;
+        switch (bson_element_type(e)) {
+            case bson_type_date:
+            case bson_type_long:
+            case bson_type_float:
+            case bson_type_timestamp:
+                e->size = 1 + bson_element_key_size(e) + 8;
+                break;
+                
+            case bson_type_code:
+            case bson_type_symbol:
+            case bson_type_string:
+            case bson_type_array:
+            case bson_type_document:
+            {
+                int32_t len = *(int32_t*)(bson_element_fieldname(e) + bson_element_key_size(e));
+                e->size = 1 + bson_element_key_size(e) + sizeof(len) + len;
+                break;
+            }
+                
+            case bson_type_bindata:
+            {
+                int32_t len = *(int32_t*)(bson_element_fieldname(e) + bson_element_key_size(e));
+                e->size = 1 + bson_element_key_size(e) + sizeof(len) + 1 + len;
+                break;
+            }
+            
+            case bson_type_oid:
+                e->size = 1 + bson_element_key_size(e) + bson_oid_size;
+                break;
+                
+            case bson_type_bool:
+                e->size = 1 + bson_element_key_size(e) + 1;
+                break;
+                
+            case bson_type_regex:
+            {
+                const char* pattern = bson_element_fieldname(e) + bson_element_key_size(e);
+                size_t pattern_len = strlen(pattern) + 1;
+                const char* opts = pattern + pattern_len;
+                size_t opts_len = strlen(opts) + 1;
+                e->size = 1 + bson_element_key_size(e) + pattern_len + opts_len;
+                break;
+            }
+                
+            case bson_type_codewscope:
+            {
+                const char* code = bson_element_fieldname(e) + bson_element_key_size(e);
+                int32_t code_len = *(int32_t*)code;
+                const char* scope = code + sizeof(code_len) + code_len;
+                int32_t scope_len = *(int32_t*)scope;
+                e->size = 1 + bson_element_key_size(e) + sizeof(code_len) + code_len + sizeof(scope_len) + scope_len;
+            }
+                
+            case bson_type_int:
+                e->size = 1 + bson_element_key_size(e) + 4;
+                break;
+                
+            case bson_type_undefined:
+            case bson_type_minkey:
+            case bson_type_maxkey:
+                e->size = 1 + bson_element_key_size(e);
+                break;
+                
+            case bson_type_eoo:
+            default:
+                assert(0);
+                break;
+        }
     }
-    
-    return internal->fieldNameSize;
+    return e->size;
 }
+

@@ -41,8 +41,8 @@ enum bson_types
     /* UTF-8 string */
     bson_type_string,
     
-    /* an embedded object */
-    bson_type_object,
+    /* an embedded document */
+    bson_type_document,
     
     /* an embedded array */
     bson_type_array,

@@ -71,7 +71,7 @@ inline bson_document_ref bson_document_create_with_data(const char *d)
 /**
  * Get first element of the document
  */
-#define bson_document_get_first(doc)        ((bson_element_ref)((doc)->data+4))
+#define bson_document_get_first(doc)        bson_element_create_with_data(doc->data + 4);
 
 
 #endif // _BSON_BSONDOCUMENT_H_
