@@ -21,8 +21,52 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include "bsondocument.h"
-/****************************** Public Impl ***********************************/
+#include "iterator.h"
 
-extern inline bson_document_ref bson_document_create();
-extern inline bson_document_ref bson_document_create_with_data(const char *d);
+
+extern inline int bson_iterator_end(bson_iterator_ref __restrict i);
+extern inline bson_element_ref bson_iterator_init(bson_iterator_ref __restrict i, bson_document_ref doc);
+
+void bson_iterator_next_el(bson_iterator_ref __restrict i, bson_element_ref e)
+{
+    if(i->next_off == 0)
+        return ;
+    
+    i->curr_off = i->next_off;
+    
+    e->data = i->d->data + i->curr_off;
+    
+    if(bson_element_type(e) == bson_type_eoo)
+    {
+        e->key_size = 0;
+        e->size = 1;
+        i->next_off = 0;
+    }
+    else
+    {
+        e->key_size = -1;
+        e->size = -1;
+        i->next_off = i->curr_off + bson_element_size(e);
+    }
+}
+
+bson_element_ref bson_iterator_next(bson_iterator_ref __restrict i)
+{
+    if(i->next_off == 0)
+        return 0;
+    
+    i->curr_off = i->next_off;
+    
+    bson_element_ref el = bson_element_create_with_data(i->d->data + i->curr_off);
+    
+    if(bson_element_type(el) == bson_type_eoo)
+    {
+        i->next_off = 0;
+    }
+    else
+    {
+        i->next_off = i->curr_off + bson_element_size(el);
+    }
+    
+    return el;
+}

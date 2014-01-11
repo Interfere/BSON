@@ -21,8 +21,8 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef _BSON_BSONELEMENT_H_
-#define _BSON_BSONELEMENT_H_
+#ifndef _BSON_ELEMENT_H_
+#define _BSON_ELEMENT_H_
 
 #include "bsontypes.h"
 
@@ -115,4 +115,4 @@ inline const char* bson_element_value(bson_element_ref __restrict e)
  */
 size_t bson_element_size(bson_element_ref __restrict e);
 
-#endif // _BSON_BSONELEMENT_H_
+#endif // _BSON_ELEMENT_H_

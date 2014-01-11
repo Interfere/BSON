@@ -21,12 +21,12 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef _BSON_BSONDOCUMENT_H_
-#define _BSON_BSONDOCUMENT_H_
+#ifndef _BSON_DOCUMENT_H_
+#define _BSON_DOCUMENT_H_
 
 #include <stdint.h>
 #include <stdlib.h>
-#include "bsonelement.h"
+#include "element.h"
 
 /**
  * Generic type for bson document
@@ -74,4 +74,4 @@ inline bson_document_ref bson_document_create_with_data(const char *d)
 #define bson_document_get_first(doc)        bson_element_create_with_data(doc->data + 4);
 
 
-#endif // _BSON_BSONDOCUMENT_H_
+#endif // _BSON_DOCUMENT_H_

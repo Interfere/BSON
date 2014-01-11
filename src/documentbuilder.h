@@ -21,12 +21,12 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef _BSON_BSONDOCUMENTBUILDER_H_
-#define _BSON_BSONDOCUMENTBUILDER_H_
+#ifndef _BSON_DOCUMENTBUILDER_H_
+#define _BSON_DOCUMENTBUILDER_H_
 
 #include "bsontypes.h"
-#include "bsonelement.h"
-#include "bsondocument.h"
+#include "element.h"
+#include "document.h"
 #include "oid.h"
 #include "cpl_region.h"
 
@@ -203,4 +203,4 @@ inline void bson_document_builder_append_bin(bson_document_builder_ref __restric
 }
 
 
-#endif // _BSON_BSONDOCUMENTBUILDER_H_
+#endif // _BSON_DOCUMENTBUILDER_H_

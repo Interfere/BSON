@@ -9,12 +9,13 @@
 /* Begin PBXBuildFile section */
 		6CD537AC186DC377007F0232 /* libBSON.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6CD537A8186DC330007F0232 /* libBSON.a */; };
 		71098031186E0A3F0017C395 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 71098030186E0A3F0017C395 /* Security.framework */; };
-		71F455221875E4F500FCBA58 /* bsondocument.c in Sources */ = {isa = PBXBuildFile; fileRef = 71F455191875E4F500FCBA58 /* bsondocument.c */; };
-		71F455231875E4F500FCBA58 /* bsondocument.h in Headers */ = {isa = PBXBuildFile; fileRef = 71F4551A1875E4F500FCBA58 /* bsondocument.h */; };
-		71F455241875E4F500FCBA58 /* bsondocumentbuilder.c in Sources */ = {isa = PBXBuildFile; fileRef = 71F4551B1875E4F500FCBA58 /* bsondocumentbuilder.c */; };
-		71F455251875E4F500FCBA58 /* bsondocumentbuilder.h in Headers */ = {isa = PBXBuildFile; fileRef = 71F4551C1875E4F500FCBA58 /* bsondocumentbuilder.h */; };
-		71F455261875E4F500FCBA58 /* bsonelement.c in Sources */ = {isa = PBXBuildFile; fileRef = 71F4551D1875E4F500FCBA58 /* bsonelement.c */; };
-		71F455271875E4F500FCBA58 /* bsonelement.h in Headers */ = {isa = PBXBuildFile; fileRef = 71F4551E1875E4F500FCBA58 /* bsonelement.h */; };
+		713666FB1881903A00A4FE3A /* iterator.c in Sources */ = {isa = PBXBuildFile; fileRef = 713666FA1881903A00A4FE3A /* iterator.c */; };
+		71F455221875E4F500FCBA58 /* document.c in Sources */ = {isa = PBXBuildFile; fileRef = 71F455191875E4F500FCBA58 /* document.c */; };
+		71F455231875E4F500FCBA58 /* document.h in Headers */ = {isa = PBXBuildFile; fileRef = 71F4551A1875E4F500FCBA58 /* document.h */; };
+		71F455241875E4F500FCBA58 /* documentbuilder.c in Sources */ = {isa = PBXBuildFile; fileRef = 71F4551B1875E4F500FCBA58 /* documentbuilder.c */; };
+		71F455251875E4F500FCBA58 /* documentbuilder.h in Headers */ = {isa = PBXBuildFile; fileRef = 71F4551C1875E4F500FCBA58 /* documentbuilder.h */; };
+		71F455261875E4F500FCBA58 /* element.c in Sources */ = {isa = PBXBuildFile; fileRef = 71F4551D1875E4F500FCBA58 /* element.c */; };
+		71F455271875E4F500FCBA58 /* element.h in Headers */ = {isa = PBXBuildFile; fileRef = 71F4551E1875E4F500FCBA58 /* element.h */; };
 		71F455281875E4F500FCBA58 /* bsontypes.h in Headers */ = {isa = PBXBuildFile; fileRef = 71F4551F1875E4F500FCBA58 /* bsontypes.h */; };
 		71F455291875E4F500FCBA58 /* oid.c in Sources */ = {isa = PBXBuildFile; fileRef = 71F455201875E4F500FCBA58 /* oid.c */; };
 		71F4552A1875E4F500FCBA58 /* oid.h in Headers */ = {isa = PBXBuildFile; fileRef = 71F455211875E4F500FCBA58 /* oid.h */; };
@@ -69,13 +70,15 @@
 		6CD53799186DC2B3007F0232 /* BSON Tests */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "BSON Tests"; sourceTree = BUILT_PRODUCTS_DIR; };
 		6CD537A8186DC330007F0232 /* libBSON.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libBSON.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		71098030186E0A3F0017C395 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
+		713666F818818D0A00A4FE3A /* iterator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = iterator.h; path = ../src/iterator.h; sourceTree = "<group>"; };
+		713666FA1881903A00A4FE3A /* iterator.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = iterator.c; path = ../src/iterator.c; sourceTree = "<group>"; };
 		71F455101875E4B500FCBA58 /* CPL.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = CPL.xcodeproj; path = ../deps/cpl/xcode/CPL.xcodeproj; sourceTree = "<group>"; };
-		71F455191875E4F500FCBA58 /* bsondocument.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = bsondocument.c; path = ../src/bsondocument.c; sourceTree = "<group>"; };
-		71F4551A1875E4F500FCBA58 /* bsondocument.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = bsondocument.h; path = ../src/bsondocument.h; sourceTree = "<group>"; };
-		71F4551B1875E4F500FCBA58 /* bsondocumentbuilder.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = bsondocumentbuilder.c; path = ../src/bsondocumentbuilder.c; sourceTree = "<group>"; };
-		71F4551C1875E4F500FCBA58 /* bsondocumentbuilder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = bsondocumentbuilder.h; path = ../src/bsondocumentbuilder.h; sourceTree = "<group>"; };
-		71F4551D1875E4F500FCBA58 /* bsonelement.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = bsonelement.c; path = ../src/bsonelement.c; sourceTree = "<group>"; };
-		71F4551E1875E4F500FCBA58 /* bsonelement.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = bsonelement.h; path = ../src/bsonelement.h; sourceTree = "<group>"; };
+		71F455191875E4F500FCBA58 /* document.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = document.c; path = ../src/document.c; sourceTree = "<group>"; };
+		71F4551A1875E4F500FCBA58 /* document.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = document.h; path = ../src/document.h; sourceTree = "<group>"; };
+		71F4551B1875E4F500FCBA58 /* documentbuilder.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = documentbuilder.c; path = ../src/documentbuilder.c; sourceTree = "<group>"; };
+		71F4551C1875E4F500FCBA58 /* documentbuilder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = documentbuilder.h; path = ../src/documentbuilder.h; sourceTree = "<group>"; };
+		71F4551D1875E4F500FCBA58 /* element.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = element.c; path = ../src/element.c; sourceTree = "<group>"; };
+		71F4551E1875E4F500FCBA58 /* element.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = element.h; path = ../src/element.h; sourceTree = "<group>"; };
 		71F4551F1875E4F500FCBA58 /* bsontypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = bsontypes.h; path = ../src/bsontypes.h; sourceTree = "<group>"; };
 		71F455201875E4F500FCBA58 /* oid.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = oid.c; path = ../src/oid.c; sourceTree = "<group>"; };
 		71F455211875E4F500FCBA58 /* oid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = oid.h; path = ../src/oid.h; sourceTree = "<group>"; };
@@ -117,13 +120,15 @@
 			isa = PBXGroup;
 			children = (
 				71F4552B1875E50900FCBA58 /* main.c */,
-				71F455191875E4F500FCBA58 /* bsondocument.c */,
-				71F4551A1875E4F500FCBA58 /* bsondocument.h */,
-				71F4551B1875E4F500FCBA58 /* bsondocumentbuilder.c */,
-				71F4551C1875E4F500FCBA58 /* bsondocumentbuilder.h */,
-				71F4551D1875E4F500FCBA58 /* bsonelement.c */,
-				71F4551E1875E4F500FCBA58 /* bsonelement.h */,
+				71F455191875E4F500FCBA58 /* document.c */,
+				71F4551A1875E4F500FCBA58 /* document.h */,
+				71F4551B1875E4F500FCBA58 /* documentbuilder.c */,
+				71F4551C1875E4F500FCBA58 /* documentbuilder.h */,
+				71F4551D1875E4F500FCBA58 /* element.c */,
+				71F4551E1875E4F500FCBA58 /* element.h */,
 				71F4551F1875E4F500FCBA58 /* bsontypes.h */,
+				713666F818818D0A00A4FE3A /* iterator.h */,
+				713666FA1881903A00A4FE3A /* iterator.c */,
 				71F455201875E4F500FCBA58 /* oid.c */,
 				71F455211875E4F500FCBA58 /* oid.h */,
 			);
@@ -173,9 +178,9 @@
 			files = (
 				71F455281875E4F500FCBA58 /* bsontypes.h in Headers */,
 				71F4552A1875E4F500FCBA58 /* oid.h in Headers */,
-				71F455231875E4F500FCBA58 /* bsondocument.h in Headers */,
-				71F455271875E4F500FCBA58 /* bsonelement.h in Headers */,
-				71F455251875E4F500FCBA58 /* bsondocumentbuilder.h in Headers */,
+				71F455231875E4F500FCBA58 /* document.h in Headers */,
+				71F455271875E4F500FCBA58 /* element.h in Headers */,
+				71F455251875E4F500FCBA58 /* documentbuilder.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -280,10 +285,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				71F455241875E4F500FCBA58 /* bsondocumentbuilder.c in Sources */,
-				71F455261875E4F500FCBA58 /* bsonelement.c in Sources */,
+				71F455241875E4F500FCBA58 /* documentbuilder.c in Sources */,
+				71F455261875E4F500FCBA58 /* element.c in Sources */,
+				713666FB1881903A00A4FE3A /* iterator.c in Sources */,
 				71F455291875E4F500FCBA58 /* oid.c in Sources */,
-				71F455221875E4F500FCBA58 /* bsondocument.c in Sources */,
+				71F455221875E4F500FCBA58 /* document.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

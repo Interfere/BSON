@@ -21,7 +21,7 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include "bsonelement.h"
+#include "element.h"
 
 #include <assert.h>
 #include "oid.h"

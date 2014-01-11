@@ -25,8 +25,9 @@
 #include <stdio.h>
 #include "oid.h"
 #include "cpl_array.h"
-#include "bsondocumentbuilder.h"
-#include "bsondocument.h"
+#include "documentbuilder.h"
+#include "document.h"
+#include "iterator.h"
 
 static inline void test_oid()
 {
@@ -94,12 +95,10 @@ static inline void test_builder()
     bson_document_ref d = bson_document_builder_finalize(b);
     printf("sizeof d: %d\n", bson_document_size(d));
     
-    bson_element_ref el = bson_document_get_first(d);
-    while (bson_element_type(el) != bson_type_eoo) {
+    bson_iterator_t iter;
+    bson_element_ref el = 0;
+    for (el = bson_iterator_init(&iter, d); !bson_iterator_end(&iter); bson_iterator_next_el(&iter, el)) {
         printf("Element: size=%zu key=%s\n", bson_element_size(el), bson_element_fieldname(el));
-        bson_element_ref tmp = bson_element_create_with_data(el->data + bson_element_size(el));
-        bson_element_destroy(el);
-        el = tmp;
     }
     
     bson_element_destroy(el);

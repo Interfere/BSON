@@ -21,7 +21,7 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include "bsondocumentbuilder.h"
+#include "documentbuilder.h"
 
 extern inline bson_document_builder_ref bson_document_builder_create();
 extern inline bson_document_ref bson_document_builder_finalize(bson_document_builder_ref __restrict bld);
