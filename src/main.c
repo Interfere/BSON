@@ -81,6 +81,26 @@ static inline void test_cpl_array()
 
 static inline void test_builder()
 {
+    char* argv[4] = {
+        "index1",
+        "index2",
+        "index3",
+        "index4"
+    };
+    bson_array_builder_ref ab = bson_array_builder_create();
+    for (int i = 0; i < 4; i++) {
+        bson_document_builder_ref d = bson_document_builder_create();
+        
+        bson_document_builder_append_str(d, "name", argv[i]);
+        bson_document_builder_append_i(d, "page", i+2);
+        
+        bson_document_ref doc = bson_document_builder_finalize(d);
+        bson_array_builder_append_doc(ab, doc);
+        bson_document_destroy(doc);
+    }
+    
+    bson_array_ref indicies = bson_array_builder_finalize(ab);
+    
     bson_document_builder_ref b = bson_document_builder_create();
     
     bson_oid_ref oid = bson_oid_create();
@@ -90,7 +110,8 @@ static inline void test_builder()
     
     bson_document_builder_append_str(b, "title", "test_table");
     bson_document_builder_append_b(b, "isActive", 1);
-    bson_document_builder_append_i(b, "cols", 6);
+    bson_document_builder_append_arr(b, "indicies", indicies);
+    bson_array_destroy(indicies);
     
     bson_document_ref d = bson_document_builder_finalize(b);
     printf("sizeof d: %d\n", bson_document_size(d));
@@ -98,7 +119,44 @@ static inline void test_builder()
     bson_iterator_t iter;
     bson_element_ref el = 0;
     for (el = bson_iterator_init(&iter, d); !bson_iterator_end(&iter); bson_iterator_next_el(&iter, el)) {
-        printf("Element: size=%zu key=%s\n", bson_element_size(el), bson_element_fieldname(el));
+        printf("Element: size=%zu key=%s", bson_element_size(el), bson_element_fieldname(el));
+        
+        switch(bson_element_type(el))
+        {
+            case bson_type_string:
+                printf(" value=[%d]%s", *(int32_t*)bson_element_value(el), bson_element_value(el) + sizeof(int32_t));
+                break;
+            
+            case bson_type_bool:
+                printf(" value=%s", (*bson_element_value(el)?"true":"false"));
+                break;
+                
+            case bson_type_oid:
+            {
+                char* oid = bson_oid_string_create((const bson_oid_ref)bson_element_value(el));
+                printf(" value=%s", oid);
+                free(oid);
+                break;
+            }
+                
+            case bson_type_array:
+            {
+                bson_array_ref arr = bson_array_create_with_data(bson_element_value(el));
+                printf(" values = [%d]{\n", bson_document_size(arr));
+                bson_iterator_t i;
+                bson_element_ref e = 0;
+                for(e = bson_iterator_init(&i, arr); !bson_iterator_end(&i); bson_iterator_next_el(&i, e))
+                {
+                    printf("    Element: size=%zu key=%s\n", bson_element_size(e), bson_element_fieldname(e));
+                }
+                bson_element_destroy(e);
+                bson_array_destroy(arr);
+                printf("};");
+                break;
+            }
+        }
+        
+        putchar('\n');
     }
     
     bson_element_destroy(el);

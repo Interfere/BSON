@@ -73,5 +73,13 @@ inline bson_document_ref bson_document_create_with_data(const char *d)
  */
 #define bson_document_get_first(doc)        bson_element_create_with_data(doc->data + 4);
 
+/**
+ * Array is a special type of document, with indexes as keys
+ */
+#define bson_array_ref                      bson_document_ref
+#define bson_array_create()                 bson_document_create()
+#define bson_array_create_with_data(d)      bson_document_create_with_data(d)
+#define bson_array_destroy(a)               bson_document_destroy(a)
+#define bson_array_get_first(a)             bson_document_get_first(a)
 
 #endif // _BSON_DOCUMENT_H_

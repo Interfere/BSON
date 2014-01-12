@@ -67,11 +67,16 @@ size_t bson_element_size(bson_element_ref __restrict e)
             case bson_type_code:
             case bson_type_symbol:
             case bson_type_string:
+            {
+                int32_t len = *(int32_t*)(bson_element_fieldname(e) + bson_element_key_size(e));
+                e->size = 1 + bson_element_key_size(e) + sizeof(len) + len;
+                break;
+            }
             case bson_type_array:
             case bson_type_document:
             {
                 int32_t len = *(int32_t*)(bson_element_fieldname(e) + bson_element_key_size(e));
-                e->size = 1 + bson_element_key_size(e) + sizeof(len) + len;
+                e->size = 1 + bson_element_key_size(e) + len;
                 break;
             }
                 
