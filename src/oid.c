@@ -26,8 +26,8 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include <unistd.h>
-#include <cpl_random.h>
-#include <cpl_atomic.h>
+#include "cpl_random.h"
+#include "cpl_atomic.h"
 
 /*********************** Private ObjectID properties **************************/
 static int64_t s_sequential_inc64 = 0;

@@ -24,10 +24,9 @@
 #ifndef _BSON_ELEMENT_H_
 #define _BSON_ELEMENT_H_
 
-#include "bsontypes.h"
-
 #include <stdlib.h>
 #include <string.h>
+#include <bson/bsontypes.h>
 
 /**
  * Generic type for bson element

@@ -24,8 +24,8 @@
 #ifndef _BSON_ITERATOR_H_
 #define _BSON_ITERATOR_H_
 
-#include "element.h"
-#include "document.h"
+#include <bson/element.h>
+#include <bson/document.h>
 
 typedef struct bson_iterator bson_iterator_t;
 typedef struct bson_iterator *bson_iterator_ref;

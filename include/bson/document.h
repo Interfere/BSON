@@ -26,7 +26,7 @@
 
 #include <stdint.h>
 #include <stdlib.h>
-#include "element.h"
+#include <bson/element.h>
 
 /**
  * Generic type for bson document

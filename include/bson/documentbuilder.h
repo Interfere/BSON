@@ -27,11 +27,11 @@
 #include <limits.h>
 #include <stdio.h>
 
-#include "bsontypes.h"
-#include "element.h"
-#include "document.h"
-#include "oid.h"
-#include "cpl_region.h"
+#include <bson/bsontypes.h>
+#include <bson/element.h>
+#include <bson/document.h>
+#include <bson/oid.h>
+#include <cpl/cpl_region.h>
 
 /*
  * Generic struct for builder
