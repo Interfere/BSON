@@ -34,36 +34,27 @@
 typedef struct bson_element* bson_element_ref;
 struct bson_element
 {
-    const char*     data;       /* Raw Data of an element */
-    size_t          key_size;
-    size_t          size;
+    const char  data[1];        /* Raw Data of an element */
 };
 
 /**
  * Creates an empty BSON element
  */
-inline bson_element_ref bson_element_create()
+static inline bson_element_ref bson_element_create()
 {
     static const char z = 0;
-    bson_element_ref __restrict e = (bson_element_ref)malloc(sizeof(struct bson_element));
-    if(e)
-    {
-        e->data = &z;
-        e->key_size = 0;
-        e->size = 1;
-    }
+    bson_element_ref __restrict e = (bson_element_ref)&z;
     return e;
 }
 
 /**
  * Creates BSON element with given data
  */
-extern bson_element_ref bson_element_create_with_data(const char *d);
-
-/**
- * Destructs BSON element
- */
-#define bson_element_destroy(e)             free(e)
+static inline bson_element_ref bson_element_create_with_data(const char *d)
+{
+    bson_element_ref __restrict e = (bson_element_ref)d;
+    return e;
+}
 
 /**
  * Get type of BSON element
@@ -73,7 +64,7 @@ extern bson_element_ref bson_element_create_with_data(const char *d);
 /**
  * Get field name of BSON element
  */
-inline const char* bson_element_fieldname(bson_element_ref __restrict e)
+static inline const char* bson_element_fieldname(bson_element_ref __restrict e)
 {
     if(bson_element_type(e) == bson_type_eoo)
     {
@@ -86,20 +77,15 @@ inline const char* bson_element_fieldname(bson_element_ref __restrict e)
 /**
  * Get size of the field of BSON element
  */
-inline size_t bson_element_key_size(bson_element_ref __restrict e)
+static inline size_t bson_element_key_size(bson_element_ref __restrict e)
 {
-    if(e->key_size == -1)
-    {
-        e->key_size = strlen(bson_element_fieldname(e)) + 1;
-    }
-    
-    return e->key_size;
+    return strlen(bson_element_fieldname(e)) + 1;
 }
 
 /**
  * Get Raw data of BSON element value
  */
-inline const char* bson_element_value(bson_element_ref __restrict e)
+static inline const char* bson_element_value(bson_element_ref __restrict e)
 {
     if(bson_element_type(e) == bson_type_eoo)
     {
@@ -110,8 +96,16 @@ inline const char* bson_element_value(bson_element_ref __restrict e)
 }
 
 /**
+ * Get size of the value.
+ */
+size_t bson_element_value_size(bson_element_ref __restrict e);
+
+/**
  * Get size of the element.
  */
-size_t bson_element_size(bson_element_ref __restrict e);
+static inline size_t bson_element_size(bson_element_ref __restrict e)
+{
+    return 1 + bson_element_key_size(e) + bson_element_value_size(e);
+}
 
 #endif // _BSON_ELEMENT_H_

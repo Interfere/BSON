@@ -41,8 +41,9 @@ static const int bson_oid_inc_size = 3;
 /**
  * Generic ObjectID type
  */
-#pragma pack(1)
+typedef struct bson_oid bson_oid_t;
 typedef struct bson_oid* bson_oid_ref;
+#pragma pack(1)
 struct bson_oid
 {
     union {

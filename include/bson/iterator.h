@@ -37,7 +37,7 @@ struct bson_iterator
 };
 
 bson_element_ref bson_iterator_next(bson_iterator_ref __restrict i);
-void bson_iterator_next_el(bson_iterator_ref __restrict i, bson_element_ref e);
+void bson_iterator_next_el(bson_iterator_ref __restrict i, bson_element_ref *e);
 
 inline int bson_iterator_end(bson_iterator_ref __restrict i)
 {

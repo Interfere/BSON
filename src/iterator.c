@@ -27,26 +27,22 @@
 extern inline int bson_iterator_end(bson_iterator_ref __restrict i);
 extern inline bson_element_ref bson_iterator_init(bson_iterator_ref __restrict i, bson_document_ref doc);
 
-void bson_iterator_next_el(bson_iterator_ref __restrict i, bson_element_ref e)
+void bson_iterator_next_el(bson_iterator_ref __restrict i, bson_element_ref* e)
 {
     if(i->next_off == 0)
         return ;
     
     i->curr_off = i->next_off;
     
-    e->data = i->d->data + i->curr_off;
+    *e = (bson_element_ref)(i->d->data + i->curr_off);
     
-    if(bson_element_type(e) == bson_type_eoo)
+    if(bson_element_type(*e) == bson_type_eoo)
     {
-        e->key_size = 0;
-        e->size = 1;
         i->next_off = 0;
     }
     else
     {
-        e->key_size = -1;
-        e->size = -1;
-        i->next_off = i->curr_off + bson_element_size(e);
+        i->next_off = i->curr_off + bson_element_size(*e);
     }
 }
 

@@ -34,34 +34,38 @@
 typedef struct bson_document* bson_document_ref;
 struct bson_document
 {
-    const char      *data;  /* Raw Data of the document */
+    const char data[5];     /* Raw Data of the document */
 };
 
 /**
  * Creates empty document
  */
-inline bson_document_ref bson_document_create()
+static inline bson_document_ref bson_document_create()
 {
     static const char p[] = { /* size */5, 0, 0, 0, /* eoo */0 };
-    bson_document_ref __restrict e = (bson_document_ref)malloc(sizeof(struct bson_document));
-    e->data = p;
+    bson_document_ref __restrict e = (bson_document_ref)&p;
     return e;
 }
 
 /**
  * Creates document with given data
  */
-inline bson_document_ref bson_document_create_with_data(const char *d)
+static inline bson_document_ref bson_document_create_with_data(const char *d)
 {
-    bson_document_ref __restrict e = (bson_document_ref)malloc(sizeof(struct bson_document));
-    e->data = d;
+    bson_document_ref __restrict e = (bson_document_ref)d;
     return e;
 }
 
 /**
  * Destroy document
  */
-#define bson_document_destroy(doc)          free(doc)
+static inline void bson_document_destroy(bson_document_ref __restrict doc)
+{
+    if(doc->data != bson_document_create()->data)
+    {
+        free(doc);
+    }
+}
 
 /**
  * Get size of the document
