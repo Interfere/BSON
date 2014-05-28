@@ -76,7 +76,7 @@ bson_oid_ref bson_oid_create_with_string(const char *);
 /**
  * Create ObjectID with byte array
  */
-bson_oid_ref bson_oid_create_with_bytes(const uint8_t arr[bson_oid_size]);
+bson_oid_ref bson_oid_create_with_bytes(const char arr[bson_oid_size]);
 
 /**
  * Initialize ObjectID

@@ -114,7 +114,7 @@ bson_oid_ref bson_oid_create_with_string(const char *__restrict string)
     return oid;
 }
 
-bson_oid_ref bson_oid_create_with_bytes(const uint8_t arr[bson_oid_size])
+bson_oid_ref bson_oid_create_with_bytes(const char arr[bson_oid_size])
 {
     bson_oid_ref oid = (bson_oid_ref)malloc(sizeof(struct bson_oid));
     if(oid)
