@@ -51,7 +51,7 @@ inline bson_document_builder_ref bson_document_builder_create()
     bson_document_builder_ref bld = (bson_document_builder_ref)malloc(sizeof(struct bson_document_builder));
     if(bld)
     {
-        cpl_region_init(&bld->r, 0);
+        cpl_region_init(cpl_allocator_get_default(), &bld->r, 0);
         bld->r.offset = sizeof(int32_t);
         bld->index = 0;
     }
