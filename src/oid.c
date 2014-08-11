@@ -42,6 +42,38 @@ static void bson_oid_generate_machine_and_pid(struct machine_and_pid *__restrict
     *(uint16_t *)&p->machine_number[1] ^= _pid >> 16;
 }
 
+static int _hex2i(char c)
+{
+    if(c >= '0' && c <= '9')
+    {
+        return c - '0';
+    }
+    else if(c >= 'a' && c <= 'f')
+    {
+        return c - 'a' + 10;
+    }
+    else
+    {
+        return INT32_MAX;
+    }
+}
+
+static void bson_oid_parse_string(struct bson_oid *__restrict oid, const char *__restrict string)
+{
+    for (int i = 0; i < bson_oid_size; ++i)
+    {
+        char hi = string[i * 2];
+        char lo = string[i * 2 + 1];
+        
+        if(hi == '\0' || lo == '\0')
+        {
+            break;
+        }
+        
+        oid->data[i] = (_hex2i(hi) << 4) + _hex2i(lo);
+    }
+}
+
 void bson_oid_init(bson_oid_ref __restrict oid)
 {
     static struct machine_and_pid machine_and_pid = { 0, 0 };
@@ -110,7 +142,10 @@ bson_oid_ref bson_oid_create()
 bson_oid_ref bson_oid_create_with_string(const char *__restrict string)
 {
     bson_oid_ref oid = (bson_oid_ref)malloc(sizeof(struct bson_oid));
-    // TODO: init with string
+    if(oid)
+    {
+        bson_oid_parse_string(oid, string);
+    }
     return oid;
 }
 
