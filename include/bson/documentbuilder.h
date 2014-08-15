@@ -72,7 +72,7 @@ inline bson_document_ref bson_document_builder_finalize(bson_document_builder_re
     cpl_region_append_data(&bld->r, &type, sizeof(type));
     *(int32_t*)bld->r.data = (int32_t)bld->r.offset;
     
-    bson_document_ref doc = bson_document_create_with_data(bld->r.data);
+    bson_document_ref doc = (bson_document_ref)bld->r.data;
     free(bld);
     return doc;
 }

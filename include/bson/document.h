@@ -48,15 +48,6 @@ static inline bson_document_ref bson_document_create()
 }
 
 /**
- * Creates document with given data
- */
-static inline bson_document_ref bson_document_create_with_data(const char *d)
-{
-    bson_document_ref __restrict e = (bson_document_ref)d;
-    return e;
-}
-
-/**
  * Destroy document
  */
 static inline void bson_document_destroy(bson_document_ref __restrict doc)
