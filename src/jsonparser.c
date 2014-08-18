@@ -24,6 +24,9 @@
 #include "jsonparser.h"
 
 #include <stdio.h>
+#include <stdlib.h>
+
+#define HexDigit(c)				((c) <= '9' ? (c) - '0' : (toupper((c)) & 7) + 9)
 
 enum json_parser_lexems
 {
@@ -42,7 +45,8 @@ enum json_parser_lexems
 enum json_parser_tokens
 {
     JT_STRING,
-    JT_NUMBER,
+    JT_INT,
+    JT_FLOAT,
     JT_FALSE,
     JT_TRUE,
     JT_NULL
@@ -63,12 +67,17 @@ struct json_parser
 {
     const char *cur;
     const char *end;
-    struct json_token last_token;
+    struct json_token* last_token;
 };
 
-static void json_parser_start_object()
+static void json_parser_start_object(struct json_token *tok)
 {
-    printf("JL_LBRACE\n");
+    printf("JL_LBRACE");
+    if(tok)
+    {
+        printf(": %.*s", (int)tok->length, tok->start);
+    }
+    printf("\n");
 }
 
 static void json_parser_finish_object()
@@ -78,23 +87,28 @@ static void json_parser_finish_object()
 
 static int json_parse_string(struct json_parser* parser)
 {
-    parser->last_token.type = JT_STRING;
-    parser->last_token.start = ++parser->cur;
-    parser->last_token.length = 0;
-    parser->last_token.has_escape = 0;
+    parser->last_token->type = JT_STRING;
+    parser->last_token->start = ++parser->cur;
+    parser->last_token->length = 0;
+    parser->last_token->has_escape = 0;
     
     for (; parser->cur != parser->end; ++parser->cur)
     {
         char c = *parser->cur;
         
-        if(c == '\"')
+        if(c == JL_DQUOT)
         {
+            parser->last_token->length = parser->cur - parser->last_token->start;
             return 0;
         }
-        
-        if(c == '\\')
+        if(c < 0x20)
         {
-            parser->last_token.has_escape = 1;
+            return 1; // TODO: error control-character
+        }
+        
+        if(c == JL_BACKSLASH)
+        {
+            parser->last_token->has_escape = 1;
             parser->cur++;
             switch (*parser->cur) {
                 case '\"': case '/': case 'b': case 't':
@@ -102,48 +116,155 @@ static int json_parse_string(struct json_parser* parser)
                     break;
                     
                 case 'u':
-                    parser->cur++;
-                    int i = 0;
+                    parser->cur += 3;
                     break;
                     
                 default:
                     return 1; // TODO: return error invalid token
-                    break;
             }
         }
     }
     
-    return 0; // TODO: return error partial json
+    return 1; // TODO: return error partial json
+}
+
+static int json_parse_null(struct json_parser* parser)
+{
+    parser->last_token->type = JT_NULL;
+    parser->last_token->start = parser->cur;
+    parser->last_token->length = 4;
+    if(tolower(*++parser->cur) == 'u' &&
+       tolower(*++parser->cur) == 'l' &&
+       tolower(*++parser->cur) == 'l')
+    {
+        return 0;
+    }
+    return 1;
+}
+
+static int json_parse_true(struct json_parser* parser)
+{
+    parser->last_token->type = JT_TRUE;
+    parser->last_token->start = parser->cur;
+    parser->last_token->length = 4;
+    if(tolower(*++parser->cur) == 'r' &&
+       tolower(*++parser->cur) == 'u' &&
+       tolower(*++parser->cur) == 'e')
+    {
+        return 0;
+    }
+    return 1;
+}
+
+static int json_parse_false(struct json_parser* parser)
+{
+    parser->last_token->type = JT_FALSE;
+    parser->last_token->start = parser->cur;
+    parser->last_token->length = 5;
+    if(tolower(*++parser->cur) == 'a' &&
+       tolower(*++parser->cur) == 'l' &&
+       tolower(*++parser->cur) == 's' &&
+       tolower(*++parser->cur) == 'e')
+    {
+        return 0;
+    }
+    return 1;
+}
+
+static int json_parse_num(struct json_parser* parser)
+{
+    
+}
+
+static void json_parser_product_pair(struct json_parser *parser,
+                                struct json_token* key,
+                                struct json_token* val)
+{
+    printf("PRODUCT: %.*s : %.*s\n", (int)key->length, key->start, (int)val->length, val->start);
 }
 
 int json_parser_parse(const char *json, size_t nlength)
 {
-    struct json_parser parser;
-    parser.cur = json;
-    parser.end = json + nlength;
+    struct json_parser parser = {
+        .cur = json,
+        .end = json + nlength,
+        .last_token = 0
+    };
+    enum { KEY_TOKEN = 0, VAL_TOKEN = 1 };
+    struct json_token tokens[2];
     
     for(;parser.cur != parser.end; ++parser.cur)
     {
         char ch = *parser.cur;
         switch (ch) {
             case JL_LBRACE:
-                json_parser_start_object();
+                if(parser.last_token)
+                {
+                    json_parser_start_object(&tokens[KEY_TOKEN]);
+                }
+                else
+                {
+                    json_parser_start_object(0);
+                }
+                parser.last_token = &tokens[KEY_TOKEN];
                 break;
                 
             case JL_RBRACE:
+                json_parser_product_pair(&parser, &tokens[KEY_TOKEN], &tokens[VAL_TOKEN]);
                 json_parser_finish_object();
+                parser.last_token = 0;
                 break;
                 
             case JL_DQUOT:
-                json_parse_string(&parser);
+                if(json_parse_string(&parser) != 0)
+                {
+                    // error
+                    return 1;
+                }
                 break;
                 
             case JL_COLON:
-                printf("JL_COLON ");
+                parser.last_token = &tokens[VAL_TOKEN];
                 break;
                 
             case JL_COMMA:
-                printf("JL_COMMA");
+                if(parser.last_token)
+                {
+                    json_parser_product_pair(&parser, &tokens[KEY_TOKEN], &tokens[VAL_TOKEN]);
+                }
+                parser.last_token = &tokens[KEY_TOKEN];
+                break;
+                
+            case '-': case '1': case '2': case '3': case '4': case '5':
+            case '6': case '7': case '8': case '9': case '0':
+                json_parse_num(&parser);
+                break;
+                
+            case 'n':
+                if(json_parse_null(&parser) != 0)
+                {
+                    // error
+                    return 1;
+                }
+                printf("JT_NULL\n");
+                break;
+                
+            case 't':
+                if(json_parse_true(&parser))
+                {
+                    // error
+                    return 1;
+                }
+                printf("JT_TRUE\n");
+                break;
+                
+            case 'f':
+                if(json_parse_false(&parser))
+                {
+                    // error
+                    return 1;
+                }
+                printf("JT_FALSE");
                 break;
             
             case ' ': case '\t': case '\n': case '\r':
