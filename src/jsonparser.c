@@ -60,6 +60,8 @@ struct json_token
     union
     {
         int has_escape;
+        long ivalue;
+        double fvalue;
     };
 };
 
@@ -173,7 +175,67 @@ static int json_parse_false(struct json_parser* parser)
 
 static int json_parse_num(struct json_parser* parser)
 {
+    parser->last_token->type = JT_INT;
+    parser->last_token->start = parser->cur;
+    int has_exp = 0;
+    for (; parser->cur != parser->end; ++parser->cur)
+    {
+        switch (*parser->cur) {
+            case '0': case '1': case '2': case '3': case '4':
+            case '5': case '6': case '7': case '8': case '9':
+                break;
+                
+            case 'e': case 'E':
+                if(!has_exp)
+                {
+                    has_exp = 1;
+                    parser->last_token->type = JT_FLOAT;
+                    char c = *(parser->cur+1);
+                    if(isdigit(c))
+                    {
+                        break;
+                    }
+                    if(c=='+' || c=='-')
+                    {
+                        parser->cur++;
+                        break;
+                    }
+                }
+                return 1;
+                
+            case '.':
+                if(parser->last_token->type == JT_INT)
+                {
+                    parser->last_token->type = JT_FLOAT;
+                    break;
+                }
+                return 1;
+                
+            case '-':
+                if(parser->cur != parser->last_token->start)
+                {
+                    return 1;
+                }
+                break;
+                
+            default:
+                goto Lexit;
+        }
+    }
     
+Lexit:
+    if(parser->last_token->type == JT_INT)
+    {
+        parser->last_token->ivalue = atoi(parser->last_token->start);
+    }
+    else
+    {
+        parser->last_token->fvalue = atof(parser->last_token->start);
+    }
+    parser->last_token->length = parser->cur - parser->last_token->start;
+    parser->cur--;
+    
+    return 0;
 }
 
 static void json_parser_product_pair(struct json_parser *parser,
@@ -237,7 +299,10 @@ int json_parser_parse(const char *json, size_t nlength)
                 
             case '-': case '1': case '2': case '3': case '4': case '5':
             case '6': case '7': case '8': case '9': case '0':
-                json_parse_num(&parser);
+                if(json_parse_num(&parser))
+                {
+                    return 1;
+                }
                 break;
                 
             case 'n':
