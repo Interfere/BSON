@@ -25,6 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <ctype.h>
 
 #define HexDigit(c)				((c) <= '9' ? (c) - '0' : (toupper((c)) & 7) + 9)
 
@@ -85,6 +86,16 @@ static void json_parser_start_object(struct json_token *tok)
 static void json_parser_finish_object()
 {
     printf("JL_RBRACE\n");
+}
+
+static void json_parser_start_array(struct json_token *tok)
+{
+    printf("JL_LBRACKET: %.*s\n", (int)tok->length, tok->start);
+}
+
+static void json_parser_finish_array()
+{
+    printf("JL_RBRACKET\n");
 }
 
 static int json_parse_string(struct json_parser* parser)
@@ -218,8 +229,10 @@ static int json_parse_num(struct json_parser* parser)
                 }
                 break;
                 
-            default:
+            case ' ': case '\t': case '\n': case ',': case '}': case ']':
                 goto Lexit;
+                
+            default: return 1;
         }
     }
     
@@ -243,6 +256,13 @@ static void json_parser_product_pair(struct json_parser *parser,
                                 struct json_token* val)
 {
     printf("PRODUCT: %.*s : %.*s\n", (int)key->length, key->start, (int)val->length, val->start);
+}
+
+static void json_parser_product_val(struct json_parser *parser,
+                                    size_t count,
+                                    struct json_token *val)
+{
+    printf("PRODUCT: %zu : %.*s", count, (int)val->length, val->start);
 }
 
 int json_parser_parse(const char *json, size_t nlength)
@@ -272,8 +292,22 @@ int json_parser_parse(const char *json, size_t nlength)
                 break;
                 
             case JL_RBRACE:
+                if(parser.last_token == &tokens[KEY_TOKEN])
+                {
+                    return 1;
+                }
+                
                 json_parser_product_pair(&parser, &tokens[KEY_TOKEN], &tokens[VAL_TOKEN]);
                 json_parser_finish_object();
+                parser.last_token = 0;
+                break;
+                
+            case JL_LBRACKET:
+                json_parser_start_array(&tokens[KEY_TOKEN]);
+                break;
+                
+            case JL_RBRACKET:
+                json_parser_finish_array();
                 parser.last_token = 0;
                 break;
                 
@@ -299,37 +333,34 @@ int json_parser_parse(const char *json, size_t nlength)
                 
             case '-': case '1': case '2': case '3': case '4': case '5':
             case '6': case '7': case '8': case '9': case '0':
-                if(json_parse_num(&parser))
+                if(parser.last_token == &tokens[KEY_TOKEN] || json_parse_num(&parser))
                 {
                     return 1;
                 }
                 break;
                 
             case 'n':
-                if(json_parse_null(&parser) != 0)
+                if(parser.last_token == &tokens[KEY_TOKEN] || json_parse_null(&parser) != 0)
                 {
                     // error
                     return 1;
                 }
-                printf("JT_NULL\n");
                 break;
                 
             case 't':
-                if(json_parse_true(&parser))
+                if(parser.last_token == &tokens[KEY_TOKEN] || json_parse_true(&parser))
                 {
                     // error
                     return 1;
                 }
-                printf("JT_TRUE\n");
                 break;
                 
             case 'f':
-                if(json_parse_false(&parser))
+                if(parser.last_token == &tokens[KEY_TOKEN] || json_parse_false(&parser))
                 {
                     // error
                     return 1;
                 }
-                printf("JT_FALSE");
                 break;
             
             case ' ': case '\t': case '\n': case '\r':
@@ -337,7 +368,7 @@ int json_parser_parse(const char *json, size_t nlength)
                 break;
                 
             default:
-                break;
+                return 1;
         }
     }
     
