@@ -23,7 +23,7 @@
 
 #include "documentbuilder.h"
 
-extern inline bson_document_builder_ref bson_document_builder_create();
+extern inline bson_document_builder_ref bson_document_builder_create_with_parent(bson_document_builder_ref parent);
 extern inline bson_document_ref bson_document_builder_finalize(bson_document_builder_ref __restrict bld);
 
 extern inline void bson_document_builder_append_el(bson_document_builder_ref __restrict bld,
@@ -49,7 +49,8 @@ extern inline void bson_document_builder_append_date(bson_document_builder_ref _
                                                      const char* __restrict k, int64_t dt);
 extern inline void bson_document_builder_append_str(bson_document_builder_ref __restrict bld,
                                                     const char* __restrict k,
-                                                    const char* __restrict str);
+                                                    const char* __restrict str,
+                                                    int32_t size);
 extern inline void bson_document_builder_append_js(bson_document_builder_ref __restrict bld,
                                                    const char* __restrict k,
                                                    const char* __restrict js);
