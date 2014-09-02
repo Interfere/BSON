@@ -23,9 +23,13 @@
 
 #include "jsonparser.h"
 
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
+
+// For debug purpose only
+#include <stdarg.h>
 
 #include "documentbuilder.h"
 #include <cpl/cpl_array.h>
@@ -49,13 +53,13 @@ enum json_parser_lexems
 enum json_parser_tokens
 {
     JT_UNDEF = 0,
+    JT_STRING = bson_type_string,
+    JT_INT = bson_type_int,
+    JT_FLOAT = bson_type_float,
+    JT_NULL = bson_type_null,
     JT_KEY,
-    JT_STRING,
-    JT_INT,
-    JT_FLOAT,
     JT_FALSE,
-    JT_TRUE,
-    JT_NULL
+    JT_TRUE
 };
 
 struct json_token
@@ -73,125 +77,13 @@ struct json_token
 
 struct json_parser
 {
+    struct json_parser_callbacks callbacks;
     void        *data;
     const char  *cur;
     const char  *end;
     struct json_token last_token;
     struct json_token key_token;
 };
-
-static void json_parser_start_object(struct json_parser* parser)
-{
-    printf("START_OBJECT\n");
-    
-    cpl_array_ref a = (cpl_array_ref)parser->data;
-    if(!a)
-    {
-        a = cpl_array_create(sizeof(bson_document_builder_ref), 64);
-        parser->data = a;
-    }
-    
-    bson_document_builder_ref parent = 0;
-    if(a->count)
-    {
-        parent = cpl_array_back(a, bson_document_builder_ref);
-    }
-    
-    if(parent)
-    {
-        char* buffer = 0;
-        size_t len;
-        if(parser->last_token.type == JT_KEY)
-        {
-            len = parser->last_token.length + 2;
-            buffer = (char *)malloc(len);
-            *buffer = bson_type_document;
-            memcpy(buffer + 1, parser->last_token.start, parser->last_token.length);
-            buffer[len-1] = '\0';
-        }
-        else
-        {
-            len = 16 + 2;
-            buffer = (char *)malloc(len);
-            *buffer = bson_type_document;
-            len = sprintf(buffer+1, "%lu", parent->index++) + 2;
-        }
-        
-        cpl_region_append_data(&parent->r, buffer, len);
-        
-        free(buffer);
-    }
-    
-    bson_document_builder_ref b = bson_document_builder_create_with_parent(parent);
-    cpl_array_push_back(a, b);
-}
-
-static void json_parser_finish_object(struct json_parser* parser)
-{
-    printf("END_OBJECT\n");
-    cpl_array_ref a = (cpl_array_ref)parser->data;
-    
-    bson_document_builder_ref b = cpl_array_back(a, bson_document_builder_ref);
-    cpl_array_pop_back(a);
-    
-    (void)bson_document_builder_finalize(b);
-}
-
-static void json_parser_start_array(struct json_parser* parser)
-{
-    printf("START_ARRAY\n");
-    cpl_array_ref a = (cpl_array_ref)parser->data;
-    if(!a)
-    {
-        a = cpl_array_create(sizeof(bson_document_builder_ref), 64);
-        parser->data = a;
-    }
-    
-    bson_document_builder_ref parent = 0;
-    if(a->count)
-    {
-        parent = cpl_array_back(a, bson_document_builder_ref);
-    }
-    
-    if(parent)
-    {
-        char* buffer = 0;
-        size_t len;
-        if(parser->last_token.type == JT_KEY)
-        {
-            len = parser->last_token.length + 2;
-            buffer = (char *)malloc(len);
-            *buffer = bson_type_array;
-            memcpy(buffer + 1, parser->last_token.start, parser->last_token.length);
-            buffer[len-1] = '\0';
-        }
-        else
-        {
-            len = 16 + 2;
-            buffer = (char *)malloc(len);
-            *buffer = bson_type_array;
-            len = sprintf(buffer+1, "%lu", parent->index++) + 2;
-        }
-        
-        cpl_region_append_data(&parent->r, buffer, len);
-        
-        free(buffer);
-    }
-    
-    bson_document_builder_ref b = bson_document_builder_create_with_parent(parent);
-    cpl_array_push_back(a, b);
-}
-
-static void json_parser_finish_array(struct json_parser* parser)
-{
-    printf("END_ARRAY\n");
-    cpl_array_ref a = (cpl_array_ref)parser->data;
-    
-    bson_document_builder_ref b = cpl_array_back(a, bson_document_builder_ref);
-    cpl_array_pop_back(a);
-    
-    (void)bson_document_builder_finalize(b);
-}
 
 static void json_parser_colon(struct json_parser* parser)
 {
@@ -200,40 +92,178 @@ static void json_parser_colon(struct json_parser* parser)
     parser->key_token.type = JT_KEY;
 }
 
+static void jsonProductPair(struct json_parser* parser)
+{
+    if(!parser->callbacks.xProductPair) return;
+    
+    char* key = strndup(parser->key_token.start, parser->key_token.length);
+    
+    switch (parser->last_token.type) {
+        case JT_STRING:
+        {
+            char* val = strndup(parser->last_token.start, parser->last_token.length);
+            
+            parser->callbacks.xProductPair(parser->data, key, bson_type_string, val);
+            
+            free(val);
+            break;
+        }
+            
+        case JT_FLOAT:
+            parser->callbacks.xProductPair(parser->data, key, bson_type_float, parser->last_token.fvalue);
+            break;
+            
+        case JT_INT:
+            parser->callbacks.xProductPair(parser->data, key, bson_type_int, parser->last_token.ivalue);
+            break;
+            
+        case JT_TRUE:
+            parser->callbacks.xProductPair(parser->data, key, bson_type_bool, 1);
+            break;
+            
+        case JT_FALSE:
+            parser->callbacks.xProductPair(parser->data, key, bson_type_bool, 0);
+            break;
+            
+        case JT_NULL:
+            parser->callbacks.xProductPair(parser->data, key, bson_type_null);
+            break;
+            
+        case JT_KEY:
+        default:
+            assert(0);
+            break;
+    }
+    
+    free(key);
+}
+
+static void jsonProductValue(struct json_parser* parser)
+{
+    if(!parser->callbacks.xProductVal) return;
+    
+    switch (parser->last_token.type) {
+        case JT_STRING:
+        {
+            char* val = strndup(parser->last_token.start, parser->last_token.length);
+            
+            parser->callbacks.xProductVal(parser->data, bson_type_string, val);
+            
+            free(val);
+            break;
+        }
+            
+        case JT_FLOAT:
+            parser->callbacks.xProductVal(parser->data, bson_type_float, parser->last_token.fvalue);
+            break;
+            
+        case JT_INT:
+            parser->callbacks.xProductVal(parser->data, bson_type_int, parser->last_token.ivalue);
+            break;
+            
+        case JT_TRUE:
+            parser->callbacks.xProductVal(parser->data, bson_type_bool, 1);
+            break;
+            
+        case JT_FALSE:
+            parser->callbacks.xProductVal(parser->data, bson_type_bool, 0);
+            break;
+            
+        case JT_NULL:
+            parser->callbacks.xProductVal(parser->data, bson_type_null);
+            break;
+            
+        case JT_KEY:
+        default:
+            assert(0);
+            break;
+    }
+}
+
 static void json_parser_comma(struct json_parser* parser)
 {
     printf("COMMA\n");
-    cpl_array_ref a = (cpl_array_ref)parser->data;
-    bson_document_builder_ref b = cpl_array_back(a, bson_document_builder_ref);
-    if(parser->key_token.type == JT_UNDEF)
+    
+    if(parser->last_token.type != JT_UNDEF)
     {
-        bson_array_builder_append_str(b, parser->last_token.start, parser->last_token.length);
-    }
-    else
-    {
-        bson_document_builder_append_str(b, parser->key_token.start, parser->last_token.start, parser->last_token.length);
-    }
-}
-
-static void json_parser_string(struct json_parser* parser)
-{
-    printf("STRING \"%.*s\"\n", (int)parser->last_token.length, parser->last_token.start);
-}
-
-static void json_parser_num(struct json_parser* parser)
-{
-    printf("NUM %.*s\n", (int)parser->last_token.length, parser->last_token.start);
-    if(parser->key_token.type == JT_UNDEF)
-    {
-        cpl_array_ref a = (cpl_array_ref)parser->data;
-        bson_document_builder_ref b = cpl_array_back(a, bson_document_builder_ref);
+        if(parser->key_token.type == JT_UNDEF)
+        {
+            jsonProductValue(parser);
+        }
+        else
+        {
+            jsonProductPair(parser);
+        }
         
+        parser->key_token.type = JT_UNDEF;
+        parser->last_token.type = JT_UNDEF;
     }
 }
 
-static void json_parser_term(struct json_parser* parser)
+static void json_parser_start_object(struct json_parser* parser)
 {
-    printf("TERM %.*s\n", (int)parser->last_token.length, parser->last_token.start);
+    if(parser->callbacks.xStartObject)
+    {
+        if(parser->key_token.type == JT_KEY)
+        {
+            parser->callbacks.xStartObject(parser->data, parser->key_token.start, parser->key_token.length);
+        }
+        else
+        {
+            parser->callbacks.xStartObject(parser->data, 0, 0);
+        }
+    }
+    
+    parser->key_token.type = JT_UNDEF;
+    parser->last_token.type = JT_UNDEF;
+}
+
+static void json_parser_finish_object(struct json_parser* parser)
+{
+    if(parser->last_token.type != JT_UNDEF)
+    {
+        jsonProductPair(parser);
+    }
+    
+    if(parser->callbacks.xEndObject)
+    {
+        parser->callbacks.xEndObject(parser->data);
+    }
+    
+    parser->last_token.type = JT_UNDEF;
+}
+
+static void json_parser_start_array(struct json_parser* parser)
+{
+    if(parser->callbacks.xStartArray)
+    {
+        if(parser->key_token.type == JT_KEY)
+        {
+            parser->callbacks.xStartArray(parser->data, parser->key_token.start, parser->key_token.length);
+        }
+        else
+        {
+            parser->callbacks.xStartArray(parser->data, 0, 0);
+        }
+    }
+    
+    parser->key_token.type = JT_UNDEF;
+    parser->last_token.type = JT_UNDEF;
+}
+
+static void json_parser_finish_array(struct json_parser* parser)
+{
+    if(parser->last_token.type != JT_UNDEF)
+    {
+        jsonProductValue(parser);
+    }
+ 
+    if(parser->callbacks.xEndArray)
+    {
+        parser->callbacks.xEndArray(parser->data);
+    }
+    
+    parser->last_token.type = JT_UNDEF;
 }
 
 static int json_parse_string(struct json_parser* parser)
@@ -389,13 +419,22 @@ Lexit:
     return 0;
 }
 
-int json_parser_parse(const char *json, size_t nlength)
+int json_parser_parse(const char *json, size_t nlength, struct json_parser_callbacks* callbacks, void* data)
 {
     struct json_parser parser = {
-        .data = 0,
+        .callbacks = {0},
+        .data = data,
         .cur = json,
-        .end = json + nlength
+        .end = json + nlength,
+        .last_token = {
+            .type = JT_UNDEF
+        }
     };
+    
+    if(callbacks)
+    {
+        parser.callbacks = *callbacks;
+    }
     
     for(;parser.cur != parser.end; ++parser.cur)
     {
@@ -423,7 +462,6 @@ int json_parser_parse(const char *json, size_t nlength)
                     // error
                     return 1;
                 }
-                json_parser_string(&parser);
                 break;
                 
             case JL_COLON:
@@ -440,7 +478,6 @@ int json_parser_parse(const char *json, size_t nlength)
                 {
                     return 1;
                 }
-                json_parser_num(&parser);
                 break;
                 
             case 'n':
@@ -449,7 +486,6 @@ int json_parser_parse(const char *json, size_t nlength)
                     // error
                     return 1;
                 }
-                json_parser_term(&parser);
                 break;
                 
             case 't':
@@ -458,7 +494,6 @@ int json_parser_parse(const char *json, size_t nlength)
                     // error
                     return 1;
                 }
-                json_parser_term(&parser);
                 break;
                 
             case 'f':
@@ -467,7 +502,6 @@ int json_parser_parse(const char *json, size_t nlength)
                     // error
                     return 1;
                 }
-                json_parser_term(&parser);
                 break;
             
             case ' ': case '\t': case '\n': case '\r':
@@ -480,5 +514,168 @@ int json_parser_parse(const char *json, size_t nlength)
     }
     
     return 0;
+}
+
+// JSON 2 BSON SECTION
+struct _helper
+{
+    cpl_array_t a;
+    bson_document_ref d;
+};
+
+static void xProductPair(void *data, const char *key, bson_type_t type, ...)
+{
+    struct _helper* h = (struct _helper *)data;
+    cpl_array_ref a = &h->a;
+    bson_document_builder_ref b = cpl_array_back(a, bson_document_builder_ref);
+    
+    va_list v;
+    va_start(v, type);
+    
+    switch (type) {
+        case bson_type_null:
+            bson_document_builder_append_null(b, key);
+            break;
+            
+        case bson_type_bool:
+            bson_document_builder_append_b(b, key, va_arg(v, int));
+            break;
+            
+        case bson_type_int:
+            bson_document_builder_append_i(b, key, va_arg(v, long));
+            break;
+            
+        case bson_type_float:
+            bson_document_builder_append_d(b, key, va_arg(v, double));
+            break;
+            
+        case bson_type_string:
+            bson_document_builder_append_str(b, key, va_arg(v, char *));
+            break;
+            
+        default:
+            assert(0);
+            break;
+    }
+    
+    va_end(v);
+}
+
+static void xProductVal(void *data, bson_type_t type, ...)
+{
+    struct _helper* h = (struct _helper *)data;
+    cpl_array_ref a = &h->a;
+    bson_document_builder_ref b = cpl_array_back(a, bson_document_builder_ref);
+    
+    va_list v;
+    va_start(v, type);
+    
+    switch (type) {
+        case bson_type_null:
+            bson_array_builder_append_null(b);
+            break;
+            
+        case bson_type_bool:
+            bson_array_builder_append_b(b, va_arg(v, int));
+            break;
+            
+        case bson_type_int:
+            bson_array_builder_append_i(b, va_arg(v, long));
+            break;
+            
+        case bson_type_float:
+            bson_array_builder_append_d(b, va_arg(v, double));
+            break;
+            
+        case bson_type_string:
+            bson_array_builder_append_str(b, va_arg(v, char *));
+            break;
+            
+        default:
+            assert(0);
+            break;
+    }
+    
+    va_end(v);
+}
+
+static void xStartObject(void *data, const char *key, size_t nkey)
+{
+    struct _helper* h = (struct _helper *)data;
+    cpl_array_ref a = &h->a;
+    
+    bson_document_builder_ref parent = 0;
+    if(cpl_array_count(a))
+    {
+        parent = cpl_array_back(a, bson_document_builder_ref);
+    }
+    
+    if(parent)
+    {
+        char* buffer = 0;
+        size_t len;
+        if(key)
+        {
+            len = nkey + 2;
+            buffer = (char *)malloc(len);
+            *buffer = bson_type_document;
+            strncpy(buffer + 1, key, nkey);
+            buffer[len - 1] = '\0';
+        }
+        else
+        {
+            len = 16 + 2;
+            buffer = (char *)malloc(len);
+            *buffer = bson_type_document;
+            len = sprintf(buffer+1, "%lu", parent->index++) + 2;
+        }
+        
+        cpl_region_append_data(&parent->r, buffer, len);
+        
+        free(buffer);
+    }
+    
+    bson_document_builder_ref b = bson_document_builder_create_with_parent(parent);
+    cpl_array_push_back(a, b);
+}
+
+static void xEndObject(void *data)
+{
+    struct _helper* h = (struct _helper *)data;
+    cpl_array_ref a = &h->a;
+    
+    bson_document_builder_ref b = cpl_array_back(a, bson_document_builder_ref);
+    cpl_array_pop_back(a);
+    
+    bson_document_ref d = bson_document_builder_finalize(b);
+    
+    if(cpl_array_count(a) == 0)
+    {
+        h->d = d;
+    }
+}
+
+bson_document_ref json2bson(const char *json, size_t nlength)
+{
+    struct _helper h;
+    cpl_array_init(&h.a, sizeof(bson_document_builder_ref), 16);
+    struct json_parser_callbacks c =
+    {
+        .xProductPair = xProductPair,
+        .xProductVal = xProductVal,
+        .xStartObject = xStartObject,
+        .xEndObject = xEndObject,
+        .xStartArray = xStartObject,
+        .xEndArray = xEndObject
+    };
+    
+    int rc = json_parser_parse(json, nlength, &c, &h);
+    if(rc)
+    {
+        // TODO: report error
+        return 0;
+    }
+    
+    return h.d;
 }
 

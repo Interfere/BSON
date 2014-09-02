@@ -40,8 +40,8 @@ typedef struct bson_document_builder* bson_document_builder_ref;
 struct bson_document_builder
 {
     cpl_region_t    r;
-    size_t          off;
     size_t          index;      /* An index to build array instead of document */
+    bson_document_builder_ref parent;
 };
 
 /*
@@ -52,19 +52,17 @@ inline bson_document_builder_ref bson_document_builder_create_with_parent(bson_d
     bson_document_builder_ref bld = (bson_document_builder_ref)malloc(sizeof(struct bson_document_builder));
     if(bld)
     {
-        
         if(parent)
         {
             bld->r = parent->r;
-            bld->r.offset += sizeof(int32_t);
-            bld->off = parent->r.offset;
         }
         else
         {
             cpl_region_init(cpl_allocator_get_default(), &bld->r, 0);
-            bld->r.offset = sizeof(int32_t);
-            bld->off = 0;
         }
+        
+        bld->r.offset += sizeof(int32_t);
+        bld->parent = parent;
         bld->index = 0;
     }
     return bld;
@@ -87,8 +85,18 @@ inline bson_document_ref bson_document_builder_finalize(bson_document_builder_re
 {
     bson_type_t type = bson_type_eoo;
     cpl_region_append_data(&bld->r, &type, sizeof(type));
-    int32_t* count = bld->r.data + bld->off;
-    *count = (int32_t)(bld->r.offset - bld->off);
+    int32_t* count;
+    if(bld->parent)
+    {
+        count = bld->r.data + bld->parent->r.offset;
+        *count = (int32_t)(bld->r.offset - bld->parent->r.offset);
+        bld->parent->r = bld->r;
+    }
+    else
+    {
+        count = bld->r.data;
+        *count = (int32_t)bld->r.offset;
+    }
     
     bson_document_ref doc = (bson_document_ref)count;
     free(bld);
@@ -181,14 +189,13 @@ inline void bson_document_builder_append_date(bson_document_builder_ref __restri
 
 inline void bson_document_builder_append_str(bson_document_builder_ref __restrict bld,
                                              const char* __restrict k,
-                                             const char* __restrict str,
-                                             int32_t size)
+                                             const char* __restrict str)
 {
     bson_type_t type = bson_type_string;
     cpl_region_append_data(&bld->r, &type, sizeof(type));
     cpl_region_append_data(&bld->r, k, strlen(k)+1);
     
-    size += 1;
+    size_t size = strlen(str) + 1;
     cpl_region_append_data(&bld->r, &size, sizeof(size));
     cpl_region_append_data(&bld->r, str, size);
 }
@@ -321,11 +328,11 @@ static inline void bson_array_builder_append_date(bson_array_builder_ref __restr
 }
 
 static inline void bson_array_builder_append_str(bson_array_builder_ref __restrict bld,
-                                                 const char* __restrict str, int32_t size)
+                                                 const char* __restrict str)
 {
     char k[16];
     sprintf(k, "%lu", bld->index++);
-    bson_document_builder_append_str(bld, k, str, size);
+    bson_document_builder_append_str(bld, k, str);
 }
 
 static inline void bson_array_builder_append_js(bson_array_builder_ref __restrict bld,

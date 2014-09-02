@@ -25,7 +25,21 @@
 #define _BSON_JSONPARSER_H_
 
 #include <stdlib.h>
+#include <bson/bsontypes.h>
+#include <bson/document.h>
 
-int json_parser_parse(const char *json, size_t nlength);
+struct json_parser_callbacks
+{
+    void    (*xProductPair)(void *, const char *, bson_type_t, ...);
+    void    (*xProductVal)(void *, bson_type_t, ...);
+    void    (*xStartObject)(void *, const char *, size_t);
+    void    (*xEndObject)(void *);
+    void    (*xStartArray)(void *, const char *, size_t);
+    void    (*xEndArray)(void *);
+};
+
+int json_parser_parse(const char *json, size_t nlength, struct json_parser_callbacks* callbacks, void* data);
+
+bson_document_ref json2bson(const char *json, size_t nlength);
 
 #endif // _BSON_JSONPARSER_H_

@@ -49,8 +49,7 @@ extern inline void bson_document_builder_append_date(bson_document_builder_ref _
                                                      const char* __restrict k, int64_t dt);
 extern inline void bson_document_builder_append_str(bson_document_builder_ref __restrict bld,
                                                     const char* __restrict k,
-                                                    const char* __restrict str,
-                                                    int32_t size);
+                                                    const char* __restrict str);
 extern inline void bson_document_builder_append_js(bson_document_builder_ref __restrict bld,
                                                    const char* __restrict k,
                                                    const char* __restrict js);
