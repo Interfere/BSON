@@ -87,7 +87,6 @@ struct json_parser
 
 static void json_parser_colon(struct json_parser* parser)
 {
-    printf("COLON\n");
     parser->key_token = parser->last_token;
     parser->key_token.type = JT_KEY;
 }
@@ -182,8 +181,6 @@ static void jsonProductValue(struct json_parser* parser)
 
 static void json_parser_comma(struct json_parser* parser)
 {
-    printf("COMMA\n");
-    
     if(parser->last_token.type != JT_UNDEF)
     {
         if(parser->key_token.type == JT_UNDEF)
@@ -639,6 +636,46 @@ static void xStartObject(void *data, const char *key, size_t nkey)
     cpl_array_push_back(a, b);
 }
 
+static void xStartArray(void *data, const char *key, size_t nkey)
+{
+    struct _helper* h = (struct _helper *)data;
+    cpl_array_ref a = &h->a;
+    
+    bson_document_builder_ref parent = 0;
+    if(cpl_array_count(a))
+    {
+        parent = cpl_array_back(a, bson_document_builder_ref);
+    }
+    
+    if(parent)
+    {
+        char* buffer = 0;
+        size_t len;
+        if(key)
+        {
+            len = nkey + 2;
+            buffer = (char *)malloc(len);
+            *buffer = bson_type_array;
+            strncpy(buffer + 1, key, nkey);
+            buffer[len - 1] = '\0';
+        }
+        else
+        {
+            len = 16 + 2;
+            buffer = (char *)malloc(len);
+            *buffer = bson_type_array;
+            len = sprintf(buffer+1, "%lu", parent->index++) + 2;
+        }
+        
+        cpl_region_append_data(&parent->r, buffer, len);
+        
+        free(buffer);
+    }
+    
+    bson_document_builder_ref b = bson_document_builder_create_with_parent(parent);
+    cpl_array_push_back(a, b);
+}
+
 static void xEndObject(void *data)
 {
     struct _helper* h = (struct _helper *)data;
@@ -665,7 +702,7 @@ bson_document_ref json2bson(const char *json, size_t nlength)
         .xProductVal = xProductVal,
         .xStartObject = xStartObject,
         .xEndObject = xEndObject,
-        .xStartArray = xStartObject,
+        .xStartArray = xStartArray,
         .xEndArray = xEndObject
     };
     
