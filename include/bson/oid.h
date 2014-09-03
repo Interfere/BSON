@@ -90,6 +90,11 @@ void bson_oid_init(bson_oid_ref __restrict oid);
 void bson_oid_init_sequential(bson_oid_ref __restrict oid);
 
 /**
+ * Initialize ObjectID with given hex.
+ */
+void bson_oid_init_with_str(struct bson_oid *__restrict oid, const char *__restrict string);
+
+/**
  * Destruct ObjectID
  */
 static inline void bson_oid_destroy(bson_oid_ref __restrict oid)

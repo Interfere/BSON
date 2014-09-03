@@ -34,8 +34,6 @@
 #include "documentbuilder.h"
 #include <cpl/cpl_array.h>
 
-#define HexDigit(c)				((c) <= '9' ? (c) - '0' : (toupper((c)) & 7) + 9)
-
 enum json_parser_lexems
 {
     JL_LBRACE = '{',
@@ -53,10 +51,11 @@ enum json_parser_lexems
 enum json_parser_tokens
 {
     JT_UNDEF = 0,
-    JT_STRING = bson_type_string,
-    JT_INT = bson_type_int,
-    JT_FLOAT = bson_type_float,
-    JT_NULL = bson_type_null,
+    JT_STRING,
+    JT_INT,
+    JT_FLOAT,
+    JT_NULL,
+    JT_OID,
     JT_KEY,
     JT_FALSE,
     JT_TRUE
@@ -72,6 +71,7 @@ struct json_token
         int has_escape;
         long ivalue;
         double fvalue;
+        bson_oid_t oid;
     };
 };
 
@@ -128,6 +128,10 @@ static void jsonProductPair(struct json_parser* parser)
             parser->callbacks.xProductPair(parser->data, key, bson_type_null);
             break;
             
+        case JT_OID:
+            parser->callbacks.xProductPair(parser->data, key, bson_type_oid, &parser->last_token.oid);
+            break;
+            
         case JT_KEY:
         default:
             assert(0);
@@ -170,6 +174,10 @@ static void jsonProductValue(struct json_parser* parser)
             
         case JT_NULL:
             parser->callbacks.xProductVal(parser->data, bson_type_null);
+            break;
+            
+        case JT_OID:
+            parser->callbacks.xProductVal(parser->data, bson_type_oid, &parser->last_token.oid);
             break;
             
         case JT_KEY:
@@ -349,6 +357,35 @@ static int json_parse_false(struct json_parser* parser)
     return 1;
 }
 
+static int json_parse_oid(struct json_parser* parser)
+{
+    static const char oid_tok[] = "ObjectId(\"";
+    if(memcmp(parser->cur, oid_tok, sizeof(oid_tok) - 1))
+    {
+        return 1;
+    }
+    parser->cur += sizeof(oid_tok) - 2;
+    
+    if(json_parse_string(parser))
+    {
+        return 1;
+    }
+    
+    if(*++parser->cur != ')')
+    {
+        return 1;
+    }
+    
+    if(parser->last_token.length < 24)
+    {
+        return 1;
+    }
+    
+    parser->last_token.type = JT_OID;
+    bson_oid_init_with_str(&parser->last_token.oid, parser->last_token.start);
+    return 0;
+}
+
 static int json_parse_num(struct json_parser* parser)
 {
     parser->last_token.type = JT_INT;
@@ -500,6 +537,13 @@ int json_parser_parse(const char *json, size_t nlength, struct json_parser_callb
                     return 1;
                 }
                 break;
+                
+            case 'O':
+                if(json_parse_oid(&parser))
+                {
+                    return 1;
+                }
+                break;
             
             case ' ': case '\t': case '\n': case '\r':
                 // skip whitespace
@@ -550,6 +594,10 @@ static void xProductPair(void *data, const char *key, bson_type_t type, ...)
             bson_document_builder_append_str(b, key, va_arg(v, char *));
             break;
             
+        case bson_type_oid:
+            bson_document_builder_append_oid(b, key, va_arg(v, bson_oid_ref));
+            break;
+            
         default:
             assert(0);
             break;
@@ -586,6 +634,10 @@ static void xProductVal(void *data, bson_type_t type, ...)
             
         case bson_type_string:
             bson_array_builder_append_str(b, va_arg(v, char *));
+            break;
+            
+        case bson_type_oid:
+            bson_array_builder_append_oid(b, va_arg(v, bson_oid_ref));
             break;
             
         default:

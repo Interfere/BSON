@@ -26,6 +26,7 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include <unistd.h>
+#include <ctype.h>
 #include "cpl_random.h"
 #include "cpl_atomic.h"
 
@@ -42,23 +43,12 @@ static void bson_oid_generate_machine_and_pid(struct machine_and_pid *__restrict
     *(uint16_t *)&p->machine_number[1] ^= _pid >> 16;
 }
 
-static int _hex2i(char c)
+static inline int _hex2i(char c)
 {
-    if(c >= '0' && c <= '9')
-    {
-        return c - '0';
-    }
-    else if(c >= 'a' && c <= 'f')
-    {
-        return c - 'a' + 10;
-    }
-    else
-    {
-        return INT32_MAX;
-    }
+    return (c <= '9') ? c - '0' : (toupper(c) & 7) + 9;
 }
 
-static void bson_oid_parse_string(struct bson_oid *__restrict oid, const char *__restrict string)
+static inline void bson_oid_parse_string(struct bson_oid *__restrict oid, const char *__restrict string)
 {
     for (int i = 0; i < bson_oid_size; ++i)
     {
@@ -72,6 +62,11 @@ static void bson_oid_parse_string(struct bson_oid *__restrict oid, const char *_
         
         oid->data[i] = (_hex2i(hi) << 4) + _hex2i(lo);
     }
+}
+
+void bson_oid_init_with_str(struct bson_oid *__restrict oid, const char *__restrict string)
+{
+    bson_oid_parse_string(oid, string);
 }
 
 void bson_oid_init(bson_oid_ref __restrict oid)
